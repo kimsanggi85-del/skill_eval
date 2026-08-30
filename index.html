@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0045)https://kimsanggi85-del.github.io/skill_eval/ -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>작업자 숙련도·작업관찰 평가 | 태진다이텍</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="./작업자 숙련도·작업관찰 평가 _ 태진다이텍_files/chart.umd.min.js.다운로드"></script>
 <style>
 :root{
   --ink:#16222e;--steel:#5c6b7a;--line:#dde3e9;--paper:#f5f7f9;--card:#fff;
@@ -221,113 +221,379 @@ table.matrix tr:last-child td{border-bottom:none}
   <div class="sync" id="syncBadge"><span class="dot" id="syncDot"></span><span id="syncTxt">로컬</span></div>
 </header>
 
-<div id="loginView">
+<div id="loginView" style="display: none;">
   <div class="login-card">
     <h2>평가 시스템 로그인</h2>
     <p>생산팀 구성원 개인 PIN으로 로그인하세요.</p>
     <div class="field"><label>이름</label>
-      <select id="loginName"><option value="">— 이름 선택 —</option></select></div>
-    <div class="field"><label>PIN (4자리)</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <select id="loginName"><option value="">— 이름 선택 —</option><option value="강병주">강병주 (관리자)</option><option value="강영태">강영태</option><option value="강창구">강창구 (팀장)</option><option value="고성신">고성신</option><option value="구진석">구진석</option><option value="김고은">김고은</option><option value="김상기">김상기 (관리자)</option><option value="김태주">김태주</option><option value="박종식">박종식</option><option value="서희정">서희정</option><option value="여혜빈">여혜빈</option><option value="왕석주">왕석주</option><option value="유성환">유성환</option><option value="윤소미">윤소미</option><option value="정승옥">정승옥</option><option value="정주은">정주은</option><option value="진민성">진민성</option><option value="최두연">최두연</option><option value="최민호">최민호</option><option value="하경자">하경자</option><option value="한영숙">한영숙</option><option value="황덕순">황덕순</option><option value="황문강">황문강</option><option value="황복연">황복연</option></select></div>
+    <div class="field"><label>PIN (4자리)</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" onkeydown="if(event.key===&#39;Enter&#39;)doLogin()"></div>
     <button class="btn btn-primary" onclick="doLogin()">로그인</button>
     <p class="muted" style="margin-top:12px">개인 PIN은 회사 마스터 PIN과 동일합니다. 승인은 강창구 팀장, 시스템 관리는 김상기 관리자 권한입니다.</p>
   </div>
 </div>
 
-<div id="appView" style="display:none">
+<div id="appView" style="display: block;">
 <main>
-    <section class="view on" id="view-ledger">
+    <section class="view" id="view-ledger">
     <div class="section-title"><h2>평가 관리대장</h2><span>Evaluation Ledger</span></div>
-    <div id="ledgerBoard"></div>
+    <div id="ledgerBoard">
+    <h3 class="led-h">연간 평가일정 <span class="muted" style="font-weight:600">· 다음 평가 3분기 D-15</span></h3>
+    <div class="led-sched"><div class="led-q ok">
+      <div class="lq-name">1분기</div>
+      <div class="lq-date">2026.03.15</div>
+      <div class="lq-st">완료</div>
+      <div class="lq-bar"><i style="width:100%"></i></div>
+      <div class="lq-n">20/20명 승인완료</div>
+    </div><div class="led-q ok">
+      <div class="lq-name">2분기</div>
+      <div class="lq-date">2026.06.15</div>
+      <div class="lq-st">완료</div>
+      <div class="lq-bar"><i style="width:100%"></i></div>
+      <div class="lq-n">20/20명 승인완료</div>
+    </div><div class="led-q soon">
+      <div class="lq-name">3분기</div>
+      <div class="lq-date">2026.09.15</div>
+      <div class="lq-st">D-15</div>
+      <div class="lq-bar"><i style="width:0%"></i></div>
+      <div class="lq-n">0/20명 승인완료</div>
+    </div><div class="led-q wait">
+      <div class="lq-name">4분기</div>
+      <div class="lq-date">2026.12.15</div>
+      <div class="lq-st">예정 (D-106)</div>
+      <div class="lq-bar"><i style="width:0%"></i></div>
+      <div class="lq-n">0/20명 승인완료</div>
+    </div></div>
+    <h3 class="led-h">작업관찰 현황 (신규자 단독작업 해제)</h3>
+    <div class="layout-summary">
+      <div class="ls-chip"><b style="color:var(--ok)">20</b><span>해제 (조기 6)</span></div>
+      <div class="ls-chip"><b style="color:var(--steel)">0</b><span>진행중</span></div>
+      <div class="ls-chip"><b style="color:var(--steel)">0</b><span>재교육 필요</span></div>
+      <div class="ls-chip"><b>0</b><span>미실시</span></div>
+    </div>
+    <h3 class="led-h">작업자별 평가완료 대장 <span class="muted" style="font-weight:600">· 셀 터치 시 평가서</span></h3>
+    <div class="matrix-wrap"><table class="ledger">
+      <thead><tr><th style="text-align:left">작업자</th><th>1분기</th><th>2분기</th><th>3분기</th><th>4분기</th><th>작업관찰</th></tr></thead>
+      <tbody><tr class="led-line"><td colspan="7">SKF 씰 · 11명</td></tr><tr><td class="ld-nm">왕석주<small>210809</small></td><td class="ld-ok" onclick="openReport(&#39;S210809_Q1&#39;)">Lv3<small>86</small></td><td class="ld-ok" onclick="openReport(&#39;S210809_Q2&#39;)">Lv3<small>89</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr><td class="ld-nm">최민호<small>170213</small></td><td class="ld-ok" onclick="openReport(&#39;S170213_Q1&#39;)">Lv4<small>95</small></td><td class="ld-ok" onclick="openReport(&#39;S170213_Q2&#39;)">Lv4<small>100</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">조기해제</td></tr><tr><td class="ld-nm">강영태<small>201113</small></td><td class="ld-ok" onclick="openReport(&#39;S201113_Q1&#39;)">Lv3<small>88</small></td><td class="ld-ok" onclick="openReport(&#39;S201113_Q2&#39;)">Lv4<small>92</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr><td class="ld-nm">김태주<small>230703</small></td><td class="ld-ok" onclick="openReport(&#39;S230703_Q1&#39;)">Lv2<small>76</small></td><td class="ld-ok" onclick="openReport(&#39;S230703_Q2&#39;)">Lv2<small>77</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr><td class="ld-nm">정주은<small>070401</small></td><td class="ld-ok" onclick="openReport(&#39;S070401_Q1&#39;)">Lv4<small>95</small></td><td class="ld-ok" onclick="openReport(&#39;S070401_Q2&#39;)">Lv4<small>98</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">조기해제</td></tr><tr><td class="ld-nm">하경자<small>110514</small></td><td class="ld-ok" onclick="openReport(&#39;S110514_Q1&#39;)">Lv4<small>92</small></td><td class="ld-ok" onclick="openReport(&#39;S110514_Q2&#39;)">Lv4<small>94</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">조기해제</td></tr><tr><td class="ld-nm">한영숙<small>150427</small></td><td class="ld-ok" onclick="openReport(&#39;S150427_Q1&#39;)">Lv4<small>91</small></td><td class="ld-ok" onclick="openReport(&#39;S150427_Q2&#39;)">Lv4<small>95</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">조기해제</td></tr><tr><td class="ld-nm">고성신<small>181112</small></td><td class="ld-ok" onclick="openReport(&#39;S181112_Q1&#39;)">Lv3<small>89</small></td><td class="ld-ok" onclick="openReport(&#39;S181112_Q2&#39;)">Lv4<small>94</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr><td class="ld-nm">정승옥<small>221110</small></td><td class="ld-ok" onclick="openReport(&#39;S221110_Q1&#39;)">Lv3<small>84</small></td><td class="ld-ok" onclick="openReport(&#39;S221110_Q2&#39;)">Lv3<small>89</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr><td class="ld-nm">황복연<small>230102</small></td><td class="ld-ok" onclick="openReport(&#39;S230102_Q1&#39;)">Lv3<small>82</small></td><td class="ld-ok" onclick="openReport(&#39;S230102_Q2&#39;)">Lv3<small>86</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr><td class="ld-nm">윤소미<small>240701</small></td><td class="ld-ok" onclick="openReport(&#39;S240701_Q1&#39;)">Lv2<small>74</small></td><td class="ld-ok" onclick="openReport(&#39;S240701_Q2&#39;)">Lv2<small>78</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr class="led-line"><td colspan="7">Raceway · 6명</td></tr><tr><td class="ld-nm">박종식<small>230512</small></td><td class="ld-ok" onclick="openReport(&#39;S230512_Q1&#39;)">Lv3<small>82</small></td><td class="ld-ok" onclick="openReport(&#39;S230512_Q2&#39;)">Lv3<small>85</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr><td class="ld-nm">구진석<small>230807</small></td><td class="ld-ok" onclick="openReport(&#39;S230807_Q1&#39;)">Lv3<small>80</small></td><td class="ld-ok" onclick="openReport(&#39;S230807_Q2&#39;)">Lv3<small>86</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr><td class="ld-nm">최두연<small>110410</small></td><td class="ld-ok" onclick="openReport(&#39;S110410_Q1&#39;)">Lv4<small>94</small></td><td class="ld-ok" onclick="openReport(&#39;S110410_Q2&#39;)">Lv4<small>97</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">조기해제</td></tr><tr><td class="ld-nm">황덕순<small>230621</small></td><td class="ld-ok" onclick="openReport(&#39;S230621_Q1&#39;)">Lv2<small>78</small></td><td class="ld-ok" onclick="openReport(&#39;S230621_Q2&#39;)">Lv3<small>82</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr><td class="ld-nm">서희정<small>241021</small></td><td class="ld-ok" onclick="openReport(&#39;S241021_Q1&#39;)">Lv2<small>72</small></td><td class="ld-ok" onclick="openReport(&#39;S241021_Q2&#39;)">Lv2<small>75</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr><td class="ld-nm">김고은<small>260105</small></td><td class="ld-ok" onclick="openReport(&#39;S260105_Q1&#39;)">Lv1<small>64</small></td><td class="ld-ok" onclick="openReport(&#39;S260105_Q2&#39;)">Lv1<small>65</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제</td></tr><tr class="led-line"><td colspan="7">세동산업 · 2명</td></tr><tr><td class="ld-nm">진민성<small>250820</small></td><td class="ld-ok" onclick="openReport(&#39;S250820_Q1&#39;)">Lv1<small>68</small></td><td class="ld-ok" onclick="openReport(&#39;S250820_Q2&#39;)">Lv2<small>74</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제(재관찰)</td></tr><tr><td class="ld-nm">황문강<small>250821</small></td><td class="ld-ok" onclick="openReport(&#39;S250821_Q1&#39;)">Lv1<small>65</small></td><td class="ld-ok" onclick="openReport(&#39;S250821_Q2&#39;)">Lv1<small>68</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">해제(재관찰)</td></tr><tr class="led-line"><td colspan="7">공정관리 · 1명</td></tr><tr><td class="ld-nm">유성환<small>091123</small></td><td class="ld-ok" onclick="openReport(&#39;S091123_Q1&#39;)">Lv4<small>97</small></td><td class="ld-ok" onclick="openReport(&#39;S091123_Q2&#39;)">Lv4<small>100</small></td><td class="ld-no">-</td><td class="ld-no">-</td><td class="ld-ok">조기해제</td></tr></tbody>
+    </table></div>
+    <p class="muted" style="margin-top:8px">Lv+점수 = 승인완료 · 대기 = 팀장 승인대기 · "-" = 미실시. IATF 16949 7.2 적격성 및 SQ 인력관리 기록.</p></div>
   </section>
 
   <section class="view" id="view-eval">
-    <div class="section-title"><h2>평가 진행</h2><span id="evalUserTag"></span></div>
+    <div class="section-title"><h2>평가 진행</h2><span id="evalUserTag">김상기 · 마스터관리자</span></div>
     <div class="mode-toggle">
       <button class="on" data-m="skill" onclick="setMode(this)">숙련도 평가</button>
       <button data-m="obs" onclick="setMode(this)">작업관찰 평가</button>
     </div>
-    <div class="qtabs" id="qtabs"></div>
-    <div id="alertBar"></div>
+    <div class="qtabs" id="qtabs" style="display: flex;"><button class=" done " onclick="selectQuarter(&#39;Q1&#39;)">1분기<span class="qs">완료 20/20</span></button><button class=" done " onclick="selectQuarter(&#39;Q2&#39;)">2분기<span class="qs">완료 20/20</span></button><button class="on  cur" onclick="selectQuarter(&#39;Q3&#39;)">3분기<span class="qs">미실시</span></button><button class="  " onclick="selectQuarter(&#39;Q4&#39;)">4분기<span class="qs">미실시</span></button></div>
+    <div id="alertBar"><div class="alert pend"><span class="ai">📅</span><span><b>3분기 정기 숙련도 평가 D-15</b> — 2026-09-14 예정. 평가 준비(대상자·표준류 확인)를 진행하세요.</span></div><div class="alert info"><span class="ai">📋</span><span>3분기 숙련도 <b>미평가 20명</b> — 평가를 진행하세요. (IATF 16949 7.2 적격성)</span><button class="go" onclick="jumpFilter(&#39;none&#39;)">보기</button></div></div>
     <div class="filters">
-      <select id="fLine" onchange="renderWorkerList()"></select>
+      <select id="fLine" onchange="renderWorkerList()"><option value="">전체 라인</option><option>SKF 씰</option><option>Raceway</option><option>세동산업</option><option>공정관리</option></select>
       <select id="fStatus" onchange="renderWorkerList()">
         <option value="">전체 상태</option><option value="none">미평가</option>
         <option value="draft">작성중</option><option value="submitted">승인대기</option><option value="approved">승인완료</option>
       </select>
       <input id="fName" placeholder="이름 검색" oninput="renderWorkerList()">
     </div>
-    <div id="workerList"></div>
+    <div id="workerList"><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>유성환</b><small>091123 · 공정관리 · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W091123&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>왕석주</b><small>210809 · SKF 씰 · 금형유지보수</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W210809&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>최민호</b><small>170213 · SKF 씰 · 금형유지보수</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W170213&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>강영태</b><small>201113 · SKF 씰 · 금형유지보수</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W201113&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>박종식</b><small>230512 · Raceway · 프레스생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W230512&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>구진석</b><small>230807 · Raceway · 프레스생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W230807&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>김태주</b><small>230703 · SKF 씰 · 프레스생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W230703&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>진민성</b><small>250820 · 세동산업 · 프레스생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W250820&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>황문강</b><small>250821 · 세동산업 · 프레스생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W250821&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>정주은</b><small>070401 · SKF 씰 · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W070401&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>하경자</b><small>110514 · SKF 씰 · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W110514&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>최두연</b><small>110410 · Raceway · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W110410&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>한영숙</b><small>150427 · SKF 씰 · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W150427&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>고성신</b><small>181112 · SKF 씰 · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W181112&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>정승옥</b><small>221110 · SKF 씰 · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W221110&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>황복연</b><small>230102 · SKF 씰 · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W230102&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>황덕순</b><small>230621 · Raceway · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W230621&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>윤소미</b><small>240701 · SKF 씰 · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W240701&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>서희정</b><small>241021 · Raceway · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W241021&#39;)">평가 시작</button>
+      </div></div><div class="worker-row"><svg class="quad" width="34" height="34" viewBox="0 0 34 34"><path d="M17,17 L17,1 A16,16 0 0 1 33,17 Z" fill="#eef1f4"></path><path d="M17,17 L33,17 A16,16 0 0 1 17,33 Z" fill="#eef1f4"></path><path d="M17,17 L17,33 A16,16 0 0 1 1,17 Z" fill="#eef1f4"></path><path d="M17,17 L1,17 A16,16 0 0 1 17,1 Z" fill="#eef1f4"></path><circle cx="17" cy="17" r="16" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg>
+      <div class="info"><b>김고은</b><small>260105 · Raceway · 설비운용 및 생산</small></div>
+      <div class="acts"><span class="badge none">미평가</span>
+        
+        <button class="btn btn-dark btn-sm" onclick="startEval(&#39;W260105&#39;)">평가 시작</button>
+      </div></div></div>
   </section>
 
   <section class="view" id="view-form"></section>
 
   <section class="view" id="view-dash">
-    <div class="section-title"><h2>진행 현황</h2><span id="dashYear"></span></div>
-    <div class="kpi-grid" id="kpiGrid"></div>
-    <div class="card"><h3 style="font-size:14px;margin-bottom:12px">라인별 숙련도 평가 진행률</h3><div id="lineProg"></div></div>
-    <div class="card"><h3 style="font-size:14px;margin-bottom:12px">숙련도 Level 분포</h3><div class="chart-box"><canvas id="lvChart"></canvas></div></div>
-    <div class="card"><h3 style="font-size:14px;margin-bottom:12px">팀장 승인 대기 <span class="badge submitted" id="pendCnt"></span></h3><div id="approveList"></div></div>
+    <div class="section-title"><h2>진행 현황</h2><span id="dashYear">2026년 3분기 (숙련도)</span></div>
+    <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi"><b>20</b><span>대상 인원</span></div>
+    <div class="kpi"><b style="color:var(--ok)">0</b><span>승인 완료</span></div>
+    <div class="kpi"><b style="color:var(--amber)">0</b><span>승인 대기</span></div>
+    <div class="kpi"><b style="color:var(--danger)">20</b><span>미평가</span></div></div>
+    <div class="card"><h3 style="font-size:14px;margin-bottom:12px">라인별 숙련도 평가 진행률</h3><div id="lineProg"><div class="prog-row"><div class="lbl"><span>SKF 씰</span><span>0/11명 · 0%</span></div><div class="bar"><i style="width:0%"></i></div></div><div class="prog-row"><div class="lbl"><span>Raceway</span><span>0/6명 · 0%</span></div><div class="bar"><i style="width:0%"></i></div></div><div class="prog-row"><div class="lbl"><span>세동산업</span><span>0/2명 · 0%</span></div><div class="bar"><i style="width:0%"></i></div></div><div class="prog-row"><div class="lbl"><span>공정관리</span><span>0/1명 · 0%</span></div><div class="bar"><i style="width:0%"></i></div></div></div></div>
+    <div class="card"><h3 style="font-size:14px;margin-bottom:12px">숙련도 Level 분포</h3><div class="chart-box"><canvas id="lvChart" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div></div>
+    <div class="card"><h3 style="font-size:14px;margin-bottom:12px">팀장 승인 대기 <span class="badge submitted" id="pendCnt">0건</span></h3><div id="approveList"><div class="empty">승인 대기 건이 없습니다.</div></div></div>
   </section>
 
   <section class="view" id="view-matrix">
     <div class="section-title"><h2>다기능 현황 관리</h2><span>Skill Matrix</span></div>
     <div class="legend">
-      <span class="lg"><span id="lg1"></span>Lv.1 초보자(60~69)</span>
-      <span class="lg"><span id="lg2"></span>Lv.2 보통(70~79)</span>
-      <span class="lg"><span id="lg3"></span>Lv.3 잘함(80~89)</span>
-      <span class="lg"><span id="lg4"></span>Lv.4 지도가능(90~100)</span>
+      <span class="lg"><span id="lg1"><svg class="quad" width="18" height="18" viewBox="0 0 18 18"><path d="M9,9 L9,1 A8,8 0 0 1 17,9 Z" fill="var(--lv1)"></path><path d="M9,9 L17,9 A8,8 0 0 1 9,17 Z" fill="#eef1f4"></path><path d="M9,9 L9,17 A8,8 0 0 1 1,9 Z" fill="#eef1f4"></path><path d="M9,9 L1,9 A8,8 0 0 1 9,1 Z" fill="#eef1f4"></path><circle cx="9" cy="9" r="8" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></span>Lv.1 초보자(60~69)</span>
+      <span class="lg"><span id="lg2"><svg class="quad" width="18" height="18" viewBox="0 0 18 18"><path d="M9,9 L9,1 A8,8 0 0 1 17,9 Z" fill="var(--lv2)"></path><path d="M9,9 L17,9 A8,8 0 0 1 9,17 Z" fill="var(--lv2)"></path><path d="M9,9 L9,17 A8,8 0 0 1 1,9 Z" fill="#eef1f4"></path><path d="M9,9 L1,9 A8,8 0 0 1 9,1 Z" fill="#eef1f4"></path><circle cx="9" cy="9" r="8" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></span>Lv.2 보통(70~79)</span>
+      <span class="lg"><span id="lg3"><svg class="quad" width="18" height="18" viewBox="0 0 18 18"><path d="M9,9 L9,1 A8,8 0 0 1 17,9 Z" fill="var(--lv3)"></path><path d="M9,9 L17,9 A8,8 0 0 1 9,17 Z" fill="var(--lv3)"></path><path d="M9,9 L9,17 A8,8 0 0 1 1,9 Z" fill="var(--lv3)"></path><path d="M9,9 L1,9 A8,8 0 0 1 9,1 Z" fill="#eef1f4"></path><circle cx="9" cy="9" r="8" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></span>Lv.3 잘함(80~89)</span>
+      <span class="lg"><span id="lg4"><svg class="quad" width="18" height="18" viewBox="0 0 18 18"><path d="M9,9 L9,1 A8,8 0 0 1 17,9 Z" fill="var(--lv4)"></path><path d="M9,9 L17,9 A8,8 0 0 1 9,17 Z" fill="var(--lv4)"></path><path d="M9,9 L9,17 A8,8 0 0 1 1,9 Z" fill="var(--lv4)"></path><path d="M9,9 L1,9 A8,8 0 0 1 9,1 Z" fill="var(--lv4)"></path><circle cx="9" cy="9" r="8" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></span>Lv.4 지도가능(90~100)</span>
     </div>
 
     <h3 style="font-size:14px;margin:4px 2px 10px">분기별 레벨 추이 <span class="muted">(승인 완료 기준)</span></h3>
-    <div class="kpi-grid" id="trendKpi" style="grid-template-columns:repeat(4,1fr)"></div>
-    <div class="matrix-wrap" style="margin-bottom:8px"><table class="matrix" id="trendTbl"></table></div>
+    <div class="kpi-grid" id="trendKpi" style="grid-template-columns:repeat(4,1fr)"><div class="kpi"><b style="color:var(--amber)">2.8</b>
+      <span>1분기 평균Lv<br>완료 20/20</span></div><div class="kpi"><b style="color:var(--ok)">3.0</b>
+      <span>2분기 평균Lv<br>완료 20/20</span></div><div class="kpi"><b style="color:var(--steel)">-</b>
+      <span>3분기 평균Lv<br>미실시</span></div><div class="kpi"><b style="color:var(--steel)">-</b>
+      <span>4분기 평균Lv<br>미실시</span></div></div>
+    <div class="matrix-wrap" style="margin-bottom:8px"><table class="matrix" id="trendTbl"><thead><tr><th style="text-align:left">작업자</th><th>공정</th><th>1분기</th><th>2분기</th><th>3분기</th><th>4분기</th><th>추이</th></tr></thead><tbody><tr><td colspan="7" style="background:var(--paper);text-align:left;font-weight:800;font-size:12px;color:var(--steel)">SKF 씰</td></tr><tr><td class="wname">왕석주<small>210809</small></td><td style="font-size:11px;color:var(--steel)">금형유지보수</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">86</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">89</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">최민호<small>170213</small></td><td style="font-size:11px;color:var(--steel)">금형유지보수</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">95</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">100</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">강영태<small>201113</small></td><td style="font-size:11px;color:var(--steel)">금형유지보수</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">88</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">92</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-up">▲ +1</span></td></tr><tr><td class="wname">김태주<small>230703</small></td><td style="font-size:11px;color:var(--steel)">프레스생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv2)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv2)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">76</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv2)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv2)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">77</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">정주은<small>070401</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">95</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">98</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">하경자<small>110514</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">92</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">94</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">한영숙<small>150427</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">91</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">95</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">고성신<small>181112</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">89</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">94</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-up">▲ +1</span></td></tr><tr><td class="wname">정승옥<small>221110</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">84</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">89</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">황복연<small>230102</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">82</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">86</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">윤소미<small>240701</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv2)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv2)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">74</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv2)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv2)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">78</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td colspan="7" style="background:var(--paper);text-align:left;font-weight:800;font-size:12px;color:var(--steel)">Raceway</td></tr><tr><td class="wname">박종식<small>230512</small></td><td style="font-size:11px;color:var(--steel)">프레스생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">82</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">85</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">구진석<small>230807</small></td><td style="font-size:11px;color:var(--steel)">프레스생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">80</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">86</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">최두연<small>110410</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">94</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">97</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">황덕순<small>230621</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv2)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv2)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">78</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv3)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv3)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv3)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">82</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-up">▲ +1</span></td></tr><tr><td class="wname">서희정<small>241021</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv2)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv2)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">72</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv2)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv2)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">75</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td class="wname">김고은<small>260105</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv1)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="#eef1f4"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">64</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv1)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="#eef1f4"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">65</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td colspan="7" style="background:var(--paper);text-align:left;font-weight:800;font-size:12px;color:var(--steel)">세동산업</td></tr><tr><td class="wname">진민성<small>250820</small></td><td style="font-size:11px;color:var(--steel)">프레스생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv1)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="#eef1f4"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">68</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv2)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv2)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">74</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-up">▲ +1</span></td></tr><tr><td class="wname">황문강<small>250821</small></td><td style="font-size:11px;color:var(--steel)">프레스생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv1)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="#eef1f4"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">65</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv1)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="#eef1f4"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="#eef1f4"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="#eef1f4"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">68</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr><tr><td colspan="7" style="background:var(--paper);text-align:left;font-weight:800;font-size:12px;color:var(--steel)">공정관리</td></tr><tr><td class="wname">유성환<small>091123</small></td><td style="font-size:11px;color:var(--steel)">설비운용 및 생산</td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">97</span></div></td><td><div class="tcell"><svg class="quad" width="22" height="22" viewBox="0 0 22 22"><path d="M11,11 L11,1 A10,10 0 0 1 21,11 Z" fill="var(--lv4)"></path><path d="M11,11 L21,11 A10,10 0 0 1 11,21 Z" fill="var(--lv4)"></path><path d="M11,11 L11,21 A10,10 0 0 1 1,11 Z" fill="var(--lv4)"></path><path d="M11,11 L1,11 A10,10 0 0 1 11,1 Z" fill="var(--lv4)"></path><circle cx="11" cy="11" r="10" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg><span class="ts">100</span></div></td><td><span style="color:#d4dbe1">-</span></td><td><span style="color:#d4dbe1">-</span></td><td><span class="trend-flat">= 유지</span></td></tr></tbody></table></div>
     <p class="muted" style="margin:0 2px 18px">↑ 전분기 대비 상승 · ↓ 하락 · = 유지. 셀 = 해당 분기 종합 Level(점수).</p>
 
     <h3 style="font-size:14px;margin:4px 2px 10px">공정별 다기능 매트릭스
-      <select id="mtxQ" onchange="renderProcMatrix()" style="border:1.5px solid var(--line);border-radius:8px;padding:4px 8px;font-size:12px;margin-left:6px"></select></h3>
-    <div class="matrix-wrap"><table class="matrix" id="matrixTbl"></table></div>
+      <select id="mtxQ" onchange="renderProcMatrix()" style="border:1.5px solid var(--line);border-radius:8px;padding:4px 8px;font-size:12px;margin-left:6px"><option value="Q1">1분기</option><option value="Q2">2분기</option><option value="Q3">3분기</option><option value="Q4">4분기</option></select></h3>
+    <div class="matrix-wrap"><table class="matrix" id="matrixTbl"><thead><tr><th style="text-align:left">작업자</th><th>프레스생산</th><th>설비운용 및 생산</th><th>금형유지보수</th><th>대표</th></tr></thead><tbody><tr><td colspan="5" style="background:var(--paper);text-align:left;font-weight:800;font-size:12px;color:var(--steel)">SKF 씰</td></tr><tr><td class="wname">왕석주<small>210809</small></td><td><span style="color:#e3e8ed">·</span></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv3)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv3)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv3)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><b style="color:var(--lv3)">Lv.3</b></td></tr><tr><td class="wname">최민호<small>170213</small></td><td><span style="color:#e3e8ed">·</span></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv4)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv4)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv4)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="var(--lv4)"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><b style="color:var(--lv4)">Lv.4</b></td></tr><tr><td class="wname">강영태<small>201113</small></td><td><span style="color:#e3e8ed">·</span></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv4)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv4)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv4)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="var(--lv4)"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><b style="color:var(--lv4)">Lv.4</b></td></tr><tr><td class="wname">김태주<small>230703</small></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv2)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv2)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="#eef1f4"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv2)">Lv.2</b></td></tr><tr><td class="wname">정주은<small>070401</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv4)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv4)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv4)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="var(--lv4)"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv4)">Lv.4</b></td></tr><tr><td class="wname">하경자<small>110514</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv4)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv4)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv4)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="var(--lv4)"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv4)">Lv.4</b></td></tr><tr><td class="wname">한영숙<small>150427</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv4)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv4)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv4)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="var(--lv4)"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv4)">Lv.4</b></td></tr><tr><td class="wname">고성신<small>181112</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv4)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv4)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv4)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="var(--lv4)"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv4)">Lv.4</b></td></tr><tr><td class="wname">정승옥<small>221110</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv3)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv3)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv3)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv3)">Lv.3</b></td></tr><tr><td class="wname">황복연<small>230102</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv3)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv3)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv3)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv3)">Lv.3</b></td></tr><tr><td class="wname">윤소미<small>240701</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv2)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv2)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="#eef1f4"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv2)">Lv.2</b></td></tr><tr><td colspan="5" style="background:var(--paper);text-align:left;font-weight:800;font-size:12px;color:var(--steel)">Raceway</td></tr><tr><td class="wname">박종식<small>230512</small></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv3)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv3)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv3)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv3)">Lv.3</b></td></tr><tr><td class="wname">구진석<small>230807</small></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv3)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv3)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv3)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv3)">Lv.3</b></td></tr><tr><td class="wname">최두연<small>110410</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv4)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv4)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv4)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="var(--lv4)"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv4)">Lv.4</b></td></tr><tr><td class="wname">황덕순<small>230621</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv3)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv3)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv3)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv3)">Lv.3</b></td></tr><tr><td class="wname">서희정<small>241021</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv2)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv2)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="#eef1f4"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv2)">Lv.2</b></td></tr><tr><td class="wname">김고은<small>260105</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv1)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="#eef1f4"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="#eef1f4"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv1)">Lv.1</b></td></tr><tr><td colspan="5" style="background:var(--paper);text-align:left;font-weight:800;font-size:12px;color:var(--steel)">세동산업</td></tr><tr><td class="wname">진민성<small>250820</small></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv2)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv2)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="#eef1f4"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv2)">Lv.2</b></td></tr><tr><td class="wname">황문강<small>250821</small></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv1)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="#eef1f4"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="#eef1f4"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="#eef1f4"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv1)">Lv.1</b></td></tr><tr><td colspan="5" style="background:var(--paper);text-align:left;font-weight:800;font-size:12px;color:var(--steel)">공정관리</td></tr><tr><td class="wname">유성환<small>091123</small></td><td><span style="color:#e3e8ed">·</span></td><td><svg class="quad" width="24" height="24" viewBox="0 0 24 24"><path d="M12,12 L12,1 A11,11 0 0 1 23,12 Z" fill="var(--lv4)"></path><path d="M12,12 L23,12 A11,11 0 0 1 12,23 Z" fill="var(--lv4)"></path><path d="M12,12 L12,23 A11,11 0 0 1 1,12 Z" fill="var(--lv4)"></path><path d="M12,12 L1,12 A11,11 0 0 1 12,1 Z" fill="var(--lv4)"></path><circle cx="12" cy="12" r="11" fill="none" stroke="#c9d2da" stroke-width="1"></circle></svg></td><td><span style="color:#e3e8ed">·</span></td><td><b style="color:var(--lv4)">Lv.4</b></td></tr></tbody></table></div>
     <p class="muted" style="margin-top:10px">선택 분기의 공정별 Level입니다. 사분원 = 해당 공정 Level.</p>
   </section>
 
-  <section class="view" id="view-set">
-    <div class="section-title"><h2>설정</h2><span id="setUserTag"></span></div>
+  <section class="view on" id="view-set">
+    <div class="section-title"><h2>설정</h2><span id="setUserTag">김상기 · 마스터관리자</span></div>
     <div class="card set-block">
       <h3 style="margin-top:0">Supabase 연동</h3>
       <div class="field"><label>Project URL</label><input id="sbUrl" placeholder="https://xxxx.supabase.co"></div>
       <div class="field"><label>anon key</label><input id="sbKey" type="password" placeholder="eyJ..."></div>
       <div style="display:flex;gap:8px"><button class="btn btn-dark btn-sm" onclick="saveSb()">저장 및 연결</button>
       <button class="btn btn-ghost btn-sm" onclick="syncNow(true)">지금 동기화</button></div>
-      <h3>작업자 관리 <span class="muted" id="wkCount"></span></h3>
-      <div id="wkAdmin"></div>
+      <h3>작업자 관리 <span class="muted" id="wkCount">(20명)</span></h3>
+      <div id="wkAdmin"><div class="wk-admin-row"><div class="grow"><b>유성환</b> <small>091123 · 공정관리 · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W091123&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>왕석주</b> <small>210809 · SKF 씰 · 금형유지보수</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W210809&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>최민호</b> <small>170213 · SKF 씰 · 금형유지보수</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W170213&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>강영태</b> <small>201113 · SKF 씰 · 금형유지보수</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W201113&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>박종식</b> <small>230512 · Raceway · 프레스생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W230512&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>구진석</b> <small>230807 · Raceway · 프레스생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W230807&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>김태주</b> <small>230703 · SKF 씰 · 프레스생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W230703&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>진민성</b> <small>250820 · 세동산업 · 프레스생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W250820&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>황문강</b> <small>250821 · 세동산업 · 프레스생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W250821&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>정주은</b> <small>070401 · SKF 씰 · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W070401&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>하경자</b> <small>110514 · SKF 씰 · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W110514&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>최두연</b> <small>110410 · Raceway · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W110410&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>한영숙</b> <small>150427 · SKF 씰 · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W150427&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>고성신</b> <small>181112 · SKF 씰 · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W181112&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>정승옥</b> <small>221110 · SKF 씰 · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W221110&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>황복연</b> <small>230102 · SKF 씰 · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W230102&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>황덕순</b> <small>230621 · Raceway · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W230621&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>윤소미</b> <small>240701 · SKF 씰 · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W240701&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>서희정</b> <small>241021 · Raceway · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W241021&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>김고은</b> <small>260105 · Raceway · 설비운용 및 생산</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W260105&#39;)">삭제</button></div></div>
       <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openWorkerModal()">+ 작업자 추가</button>
 
       <h3>평가일정 알람 📅</h3>
-      <div id="alarmInfo"></div>
-      <p class="muted" style="margin:8px 0 6px">분기 정기 평가일 <b>15일 전부터</b> 앱 상단에 배너가 표시됩니다. 메일 알람(D-15·7·1·당일 08:00 발송)은 GitHub Actions로 동작하며, 아래 파일 2개를 저장소에 넣으면 됩니다.</p>
-      <details class="alarm-guide"><summary>메일 알람 설정 방법 (펼치기)</summary>
-        <ol style="font-size:12.5px;line-height:1.7;color:var(--steel);padding-left:18px;margin:8px 0">
-          <li>GitHub 저장소에 <b>scripts/eval_reminder.py</b> 생성 → 아래 ① 코드 붙여넣기</li>
-          <li><b>.github/workflows/eval_reminder.yml</b> 생성 → 아래 ② 코드 붙여넣기</li>
-          <li>저장소 Settings → Secrets and variables → Actions에 등록:<br>
-            <b>EMAIL_USER</b>(발신 Gmail) · <b>EMAIL_PASS</b>(Gmail 앱 비밀번호) · <b>EMAIL_TO</b>(수신자, 콤마 구분)</li>
-          <li>Actions 탭에서 "평가일정 메일 알람" 수동 실행(Run workflow)으로 테스트</li>
-        </ol>
-        <div style="display:flex;gap:8px;margin:6px 0 10px;flex-wrap:wrap">
-          <button class="btn btn-dark btn-sm" onclick="copyAlarm('py')">① eval_reminder.py 복사</button>
-          <button class="btn btn-dark btn-sm" onclick="copyAlarm('yml')">② eval_reminder.yml 복사</button>
+      <div id="alarmInfo"><div class="alarm-next hot">
+    다음 정기 평가: <b>3분기</b> · 2026-09-14 <span class="dd">D-15</span>
+    <div class="muted" style="font-size:11.5px;margin-top:3px">평가일 기준: 1분기 3/15 · 2분기 6/15 · 3분기 9/15 · 4분기 12/15 (매년 반복)</div>
+  </div></div>
+      <p class="muted" style="margin:8px 0 6px"><b style="color:var(--ok)">✅ 자동 메일 알람 작동 중</b> — 서버(Supabase)가 매일 08:00에 확인하여 평가일 <b>15일·7일·1일 전과 당일</b>에 메일을 발송합니다. 앱을 켜두지 않아도 동작합니다.</p>
+      <div class="alarm-guide">
+        <div style="font-size:12.5px;font-weight:800;color:var(--steel);margin-bottom:8px">알림 받는 담당자</div>
+        <div id="alarmList"><span class="muted">불러오는 중…</span></div>
+        <div id="alarmEditWrap" style="margin-top:10px;display:none">
+          <div class="field"><label>수신 메일 (한 줄에 하나씩)</label>
+            <textarea id="alarmEmails" rows="4" placeholder="hong@example.com&#10;kim@example.com"></textarea></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary btn-sm" onclick="saveAlarmRecipients()">저장</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleAlarmEdit(false)">취소</button>
+            <button class="btn btn-dark btn-sm" style="margin-left:auto" onclick="sendTestAlarm()">테스트 발송</button>
+          </div>
         </div>
-        <p class="muted" style="font-size:11.5px">평가일·알림시점 변경: 이 파일 상단의 EVAL_SCHEDULE / 스크립트의 EVAL_SCHEDULE·ALERT_DAYS를 함께 수정하세요.</p>
-      </details>
+        <button id="alarmEditBtn" class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="toggleAlarmEdit(true)">담당자 변경</button>
+      </div>
 
       <h3>데이터</h3>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" onclick="exportJson()">백업(JSON)</button>
-        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('impFile').click()">복원</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById(&#39;impFile&#39;).click()">복원</button>
         <button class="btn btn-danger btn-sm" onclick="resetData()">초기화</button>
         <input type="file" id="impFile" accept=".json" style="display:none" onchange="importJson(this)">
       </div>
-      <h3>로그인 구성원 · PIN <span class="muted" id="memCount"></span></h3>
-      <div id="memAdmin"></div>
+      <h3>로그인 구성원 · PIN <span class="muted" id="memCount">(24명 · 관리자 2 · 팀장 1)</span></h3>
+      <div id="memAdmin"><div class="wk-admin-row"><div class="grow"><b>김상기</b>
+       <small>PIN 4003 · 마스터관리자(전권)</small></div>
+     
+       <button class="btn btn-ghost btn-sm" onclick="editPin(0)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(0)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>강병주</b>
+       <small>PIN 4001 · 마스터관리자(전권)</small></div>
+     
+       <button class="btn btn-ghost btn-sm" onclick="editPin(1)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(1)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>강창구</b>
+       <small>PIN 2001 · 팀장(승인)</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(2)">팀원으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(2)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(2)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>여혜빈</b>
+       <small>PIN 2002 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(3)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(3)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(3)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>유성환</b>
+       <small>PIN 2003 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(4)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(4)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(4)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>왕석주</b>
+       <small>PIN 2004 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(5)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(5)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(5)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>정주은</b>
+       <small>PIN 2005 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(6)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(6)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(6)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>최민호</b>
+       <small>PIN 2006 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(7)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(7)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(7)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>강영태</b>
+       <small>PIN 2007 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(8)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(8)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(8)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>하경자</b>
+       <small>PIN 2008 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(9)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(9)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(9)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>한영숙</b>
+       <small>PIN 2009 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(10)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(10)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(10)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>고성신</b>
+       <small>PIN 2010 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(11)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(11)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(11)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>정승옥</b>
+       <small>PIN 2011 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(12)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(12)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(12)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>김태주</b>
+       <small>PIN 2012 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(13)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(13)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(13)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>윤소미</b>
+       <small>PIN 2013 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(14)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(14)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(14)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>최두연</b>
+       <small>PIN 2014 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(15)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(15)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(15)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>황복연</b>
+       <small>PIN 2015 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(16)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(16)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(16)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>박종식</b>
+       <small>PIN 2016 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(17)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(17)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(17)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>황덕순</b>
+       <small>PIN 2017 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(18)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(18)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(18)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>구진석</b>
+       <small>PIN 2018 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(19)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(19)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(19)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>서희정</b>
+       <small>PIN 2019 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(20)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(20)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(20)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>진민성</b>
+       <small>PIN 2020 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(21)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(21)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(21)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>황문강</b>
+       <small>PIN 2021 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(22)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(22)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(22)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>김고은</b>
+       <small>PIN 2022 · 팀원</small></div>
+     <button class="btn btn-ghost btn-sm" onclick="toggleRole(23)">팀장으로</button>
+       <button class="btn btn-ghost btn-sm" onclick="editPin(23)">PIN</button>
+       <button class="btn btn-ghost btn-sm" onclick="delMember(23)">삭제</button></div></div>
       <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openMemberModal()">+ 구성원 추가</button>
       <h3>계정</h3>
       <button class="btn btn-ghost btn-sm" onclick="logout()">로그아웃</button>
@@ -336,11 +602,11 @@ table.matrix tr:last-child td{border-bottom:none}
 </main>
 
 <nav class="tabbar">
-  <button class="on" data-v="ledger" onclick="goTab(this)"><span class="ico">📒</span>관리대장</button>
+  <button class="" data-v="ledger" onclick="goTab(this)"><span class="ico">📒</span>관리대장</button>
   <button data-v="eval" onclick="goTab(this)"><span class="ico">✍️</span>평가진행</button>
   <button data-v="dash" onclick="goTab(this)"><span class="ico">📊</span>진행현황</button>
   <button data-v="matrix" onclick="goTab(this)"><span class="ico">🗺️</span>다기능현황</button>
-  <button data-v="set" onclick="goTab(this)"><span class="ico">⚙️</span>설정</button>
+  <button data-v="set" onclick="goTab(this)" class="on"><span class="ico">⚙️</span>설정</button>
 </nav>
 </div>
 
@@ -352,7 +618,7 @@ table.matrix tr:last-child td{border-bottom:none}
     <div class="field"><label>라인</label><select id="nwLine"></select></div>
     <div class="field"><label>담당 공정</label><select id="nwProc"></select></div>
     <div style="display:flex;gap:8px;margin-top:6px">
-      <button class="btn btn-ghost" style="flex:1" onclick="closeModal('workerModal')">취소</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeModal(&#39;workerModal&#39;)">취소</button>
       <button class="btn btn-primary" style="flex:1" onclick="addWorker()">추가</button>
     </div>
   </div>
@@ -364,7 +630,7 @@ table.matrix tr:last-child td{border-bottom:none}
     <div class="field"><label>PIN (4자리)</label><input id="nmPin" inputmode="numeric" maxlength="4" placeholder="예: 2015"></div>
     <div class="field"><label>권한</label><select id="nmRole"><option value="evaluator">팀원 (평가 작성)</option><option value="leader">팀장 (평가 승인)</option></select></div>
     <div style="display:flex;gap:8px;margin-top:6px">
-      <button class="btn btn-ghost" style="flex:1" onclick="closeModal('memberModal')">취소</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeModal(&#39;memberModal&#39;)">취소</button>
       <button class="btn btn-primary" style="flex:1" onclick="addMember()">추가</button>
     </div>
   </div>
@@ -1313,140 +1579,58 @@ function renderLedger(){
     <p class="muted" style="margin-top:8px">Lv+점수 = 승인완료 · 대기 = 팀장 승인대기 · "-" = 미실시. IATF 16949 7.2 적격성 및 SQ 인력관리 기록.</p>`;
 }
 
-/* ═══ 평가일정 알람 (내장 파일 + 복사) ═══ */
-const ALARM_PY=`# -*- coding: utf-8 -*-
-"""
-작업자 숙련도 평가일정 메일 알람 (태진다이텍 품질관리팀)
-- 분기별 정기 평가일 15일 전(및 7일/1일 전) 오전에 알림 메일 발송
-- GitHub Actions 스케줄(매일 08:00 KST)로 실행
-필요 Secrets: EMAIL_USER(발신 Gmail), EMAIL_PASS(앱 비밀번호), EMAIL_TO(수신자, 콤마 구분)
-"""
-import os, smtplib, ssl
-from datetime import date, datetime, timedelta
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
-# ── 설정 ──────────────────────────────────────────────
-EVAL_SCHEDULE = {          # 분기별 정기 숙련도 평가일 (매년 반복)
-    "1분기": "03-15",
-    "2분기": "06-15",
-    "3분기": "09-15",
-    "4분기": "12-15",
-}
-ALERT_DAYS = [15, 7, 1, 0]   # 며칠 전에 메일을 보낼지 (0=당일)
-APP_URL = "https://kimsanggi85-del.github.io/"   # 평가 시스템 주소(수정 가능)
-
-EMAIL_USER = os.environ["EMAIL_USER"]
-EMAIL_PASS = os.environ["EMAIL_PASS"]
-EMAIL_TO   = [x.strip() for x in os.environ["EMAIL_TO"].split(",") if x.strip()]
-
-def next_events(today: date):
-    """오늘 기준 알림 대상(D-15/7/1/0) 평가일 목록"""
-    hits = []
-    for q, md in EVAL_SCHEDULE.items():
-        for y in (today.year, today.year + 1):
-            d = datetime.strptime(f"{y}-{md}", "%Y-%m-%d").date()
-            dd = (d - today).days
-            if dd in ALERT_DAYS:
-                hits.append((q, d, dd))
-    return sorted(hits, key=lambda x: x[1])
-
-def build_mail(q, d, dd):
-    dtxt = "오늘" if dd == 0 else f"D-{dd}"
-    subject = f"[품질관리] {q} 정기 숙련도 평가 {dtxt} 안내 ({d.isoformat()})"
-    body = f"""
-    <div style="font-family:'Malgun Gothic',sans-serif;font-size:14px;color:#1f2937">
-      <h2 style="color:#1f3a5f">📅 {q} 정기 숙련도 평가 {dtxt}</h2>
-      <table style="border-collapse:collapse;font-size:14px">
-        <tr><td style="padding:4px 12px 4px 0;color:#475569">평가 예정일</td><td><b>{d.isoformat()}</b></td></tr>
-        <tr><td style="padding:4px 12px 4px 0;color:#475569">대상</td><td>생산팀 작업자 전원 (숙련도 평가) / 신규자 작업관찰</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;color:#475569">평가자</td><td>강창구 팀장 · 김상기 과장 · 강병주 부장</td></tr>
-      </table>
-      <h3 style="color:#1f3a5f;margin-top:16px">사전 준비 사항</h3>
-      <ul style="line-height:1.7">
-        <li>평가 대상자 명단 및 라인 배치 확인</li>
-        <li>작업표준서·검사기준서·외관한도견본 등 확인용 표준류 최신본 준비</li>
-        <li>전 분기 미충족(Level Up 교육 대상)자 교육 이행 여부 확인</li>
-        <li>신규 입사자 작업관찰(1~5차) 진행 상태 점검</li>
-      </ul>
-      <p style="margin-top:14px">
-        ▶ 평가 시스템 바로가기: <a href="{APP_URL}">{APP_URL}</a>
-      </p>
-      <p style="color:#94a3b8;font-size:12px;margin-top:18px">
-        본 메일은 태진다이텍 품질관리팀 평가일정 자동알림입니다. (IATF 16949 7.2 적격성 / SQ 인력관리)
-      </p>
-    </div>
-    """
-    return subject, body
-
-def send(subject, body):
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = EMAIL_USER
-    msg["To"] = ", ".join(EMAIL_TO)
-    msg.attach(MIMEText(body, "html", "utf-8"))
-    ctx = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as s:
-        s.login(EMAIL_USER, EMAIL_PASS)
-        s.sendmail(EMAIL_USER, EMAIL_TO, msg.as_string())
-
-if __name__ == "__main__":
-    today = date.today()
-    events = next_events(today)
-    if not events:
-        print(f"{today} — 알림 대상 없음")
-    for q, d, dd in events:
-        subject, body = build_mail(q, d, dd)
-        send(subject, body)
-        print(f"발송 완료: {subject} → {', '.join(EMAIL_TO)}")
-`;
-const ALARM_YML=`name: 평가일정 메일 알람
-
-on:
-  schedule:
-    # 매일 08:00 KST (= 23:00 UTC 전날)
-    - cron: '0 23 * * *'
-  workflow_dispatch:   # 수동 실행(테스트)도 가능
-
-jobs:
-  remind:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: 평가일정 확인 및 메일 발송
-        env:
-          EMAIL_USER: \${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: \${{ secrets.EMAIL_PASS }}
-          EMAIL_TO:   \${{ secrets.EMAIL_TO }}
-        run: python scripts/eval_reminder.py
-`;
-function copyAlarm(kind){
-  const txt=kind==='py'?ALARM_PY:ALARM_YML;
-  const name=kind==='py'?'scripts/eval_reminder.py':'.github/workflows/eval_reminder.yml';
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(()=>toast(name+' 복사 완료'),()=>fallbackCopy(txt,name));
-  }else fallbackCopy(txt,name);
-}
-function fallbackCopy(txt,name){
-  const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta);
-  ta.select(); try{document.execCommand('copy');toast(name+' 복사 완료');}catch(e){toast('복사 실패 — 수동 복사 필요');}
-  document.body.removeChild(ta);
-}
 function renderAlarmInfo(){
   const el=document.getElementById('alarmInfo'); if(!el)return;
   const nx=nextEvalInfo();
   const dtxt=nx.dday===0?'오늘':'D-'+nx.dday;
-  const hot=nx.dday<=EVAL_ALERT_DAYS;
-  el.innerHTML=`<div class="alarm-next ${hot?'hot':''}">
+  el.innerHTML=`<div class="alarm-next ${nx.dday<=EVAL_ALERT_DAYS?'hot':''}">
     다음 정기 평가: <b>${Q_LABEL[nx.q]||nx.q}</b> · ${nx.date.toISOString().slice(0,10)} <span class="dd">${dtxt}</span>
     <div class="muted" style="font-size:11.5px;margin-top:3px">평가일 기준: 1분기 3/15 · 2분기 6/15 · 3분기 9/15 · 4분기 12/15 (매년 반복)</div>
   </div>`;
+  loadAlarmRecipients();
 }
+/* ═══ 메일 알람 담당자 관리 ═══ */
+async function loadAlarmRecipients(){
+  const box=document.getElementById('alarmList'); if(!box)return;
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/eval_alarm_config?id=eq.1&select=recipients',{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});
+    const rows=await r.json();
+    const list=(rows&&rows[0]&&rows[0].recipients)||[];
+    box.innerHTML=list.length?list.map(e=>`<div class="seat" style="margin-bottom:4px">📧 ${esc(e)}</div>`).join(''):'<span class="muted">등록된 수신자 없음</span>';
+    const ta=document.getElementById('alarmEmails'); if(ta&&!ta.value)ta.value=list.join('\n');
+  }catch(e){ box.innerHTML='<span class="muted">확인 불가 (오프라인)</span>'; }
+}
+function toggleAlarmEdit(on){
+  if(on&&!isManager())return toast('담당자 변경은 팀장 또는 관리자만 가능합니다');
+  document.getElementById('alarmEditWrap').style.display=on?'':'none';
+  document.getElementById('alarmEditBtn').style.display=on?'none':'';
+}
+async function saveAlarmRecipients(){
+  if(!isManager())return toast('담당자 변경은 팀장 또는 관리자만 가능합니다');
+  const raw=document.getElementById('alarmEmails').value;
+  const list=raw.split(/[\n,;]+/).map(s=>s.trim()).filter(Boolean);
+  const bad=list.filter(e=>!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e));
+  if(bad.length)return toast('메일 형식 확인: '+bad[0]);
+  if(!list.length)return toast('최소 1명은 등록해야 합니다');
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/eval_alarm_config?id=eq.1',{method:'PATCH',
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({recipients:list})});
+    if(!r.ok)throw new Error(await r.text());
+    toast('담당자 '+list.length+'명 저장 완료'); toggleAlarmEdit(false); loadAlarmRecipients();
+  }catch(e){ toast('저장 실패 — 네트워크를 확인하세요'); }
+}
+async function sendTestAlarm(){
+  if(!isManager())return toast('관리자만 가능합니다');
+  toast('테스트 메일 발송 중…');
+  try{
+    await fetch(SB_URL+'/functions/v1/eval-reminder?test=1',{method:'POST',
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:'{}'});
+    toast('테스트 메일을 발송했습니다 (수신함 확인)');
+  }catch(e){ toast('발송 요청 실패'); }
+}
+
 </script>
-</body>
-</html>
+
+
+</body></html>
