@@ -785,7 +785,7 @@ const PROD_MEMBERS=[
 ];
 const DEFAULT_DB=()=>({
   members:JSON.parse(JSON.stringify(PROD_MEMBERS)),
-  sb:{url:'https://ebthltdmxpzlkfwvdloz.supabase.co',key:''},
+  sb:{url:'https://ebthltdmxpzlkfwvdloz.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidGhsdGRteHB6bGtmd3ZkbG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNTcxNTQsImV4cCI6MjA5MDczMzE1NH0.bXqNpOtDMCFjuZROrIDm_3o0kHmNESs7EHOgGnFCxAM'},
   workers:JSON.parse(JSON.stringify(REAL_WORKERS)),
   evals:JSON.parse(JSON.stringify(PRELOAD_EVALS))
 });
@@ -793,6 +793,9 @@ const DEFAULT_DB=()=>({
 <script>
 /* ═══ 저장/동기화 ═══ */
 function load(){ try{DB=JSON.parse(localStorage.getItem(LS_KEY))}catch(e){} if(!DB||!DB.workers)DB=DEFAULT_DB();
+  if(!DB.sb)DB.sb={};
+  if(!DB.sb.url)DB.sb.url='https://ebthltdmxpzlkfwvdloz.supabase.co';
+  if(!DB.sb.key)DB.sb.key='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidGhsdGRteHB6bGtmd3ZkbG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNTcxNTQsImV4cCI6MjA5MDczMzE1NH0.bXqNpOtDMCFjuZROrIDm_3o0kHmNESs7EHOgGnFCxAM';
   if(!DB.members||!DB.members.length)DB.members=JSON.parse(JSON.stringify(PROD_MEMBERS));
   if(!DB.members.some(x=>x.role==='admin'))DB.members.unshift(m('김상기','4003','admin'));
   if(!DB.evals||!DB.evals.length)DB.evals=JSON.parse(JSON.stringify(PRELOAD_EVALS));
@@ -1593,7 +1596,7 @@ function renderAlarmInfo(){
 async function loadAlarmRecipients(){
   const box=document.getElementById('alarmList'); if(!box)return;
   try{
-    const r=await fetch(SB_URL+'/rest/v1/eval_alarm_config?id=eq.1&select=recipients',{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});
+    const r=await fetch(DB.sb.url+'/rest/v1/eval_alarm_config?id=eq.1&select=recipients',{headers:sbHeaders()});
     const rows=await r.json();
     const list=(rows&&rows[0]&&rows[0].recipients)||[];
     box.innerHTML=list.length?list.map(e=>`<div class="seat" style="margin-bottom:4px">📧 ${esc(e)}</div>`).join(''):'<span class="muted">등록된 수신자 없음</span>';
@@ -1613,8 +1616,8 @@ async function saveAlarmRecipients(){
   if(bad.length)return toast('메일 형식 확인: '+bad[0]);
   if(!list.length)return toast('최소 1명은 등록해야 합니다');
   try{
-    const r=await fetch(SB_URL+'/rest/v1/eval_alarm_config?id=eq.1',{method:'PATCH',
-      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+    const r=await fetch(DB.sb.url+'/rest/v1/eval_alarm_config?id=eq.1',{method:'PATCH',
+      headers:{...sbHeaders(),'Prefer':'return=minimal'},
       body:JSON.stringify({recipients:list})});
     if(!r.ok)throw new Error(await r.text());
     toast('담당자 '+list.length+'명 저장 완료'); toggleAlarmEdit(false); loadAlarmRecipients();
@@ -1624,8 +1627,8 @@ async function sendTestAlarm(){
   if(!isManager())return toast('관리자만 가능합니다');
   toast('테스트 메일 발송 중…');
   try{
-    await fetch(SB_URL+'/functions/v1/eval-reminder?test=1',{method:'POST',
-      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:'{}'});
+    await fetch(DB.sb.url+'/functions/v1/eval-reminder?test=1',{method:'POST',
+      headers:sbHeaders(),body:'{}'});
     toast('테스트 메일을 발송했습니다 (수신함 확인)');
   }catch(e){ toast('발송 요청 실패'); }
 }
