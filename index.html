@@ -221,7 +221,7 @@ table.matrix tr:last-child td{border-bottom:none}
   <div class="sync" id="syncBadge"><span class="dot" id="syncDot"></span><span id="syncTxt">로컬</span></div>
 </header>
 
-<div id="loginView" style="display: none;">
+<div id="loginView">
   <div class="login-card">
     <h2>평가 시스템 로그인</h2>
     <p>생산팀 구성원 개인 PIN으로 로그인하세요.</p>
@@ -233,16 +233,16 @@ table.matrix tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<div id="appView" style="display: block;">
+<div id="appView" style="display:none">
 <nav class="tabbar">
-  <button class="" data-v="ledger" onclick="goTab(this)"><span class="ico">📒</span>관리대장</button>
+  <button class="on" data-v="ledger" onclick="goTab(this)"><span class="ico">📒</span>관리대장</button>
   <button data-v="eval" onclick="goTab(this)"><span class="ico">✍️</span>평가진행</button>
   <button data-v="dash" onclick="goTab(this)"><span class="ico">📊</span>진행현황</button>
   <button data-v="matrix" onclick="goTab(this)"><span class="ico">🗺️</span>다기능현황</button>
-  <button data-v="set" onclick="goTab(this)" class="on"><span class="ico">⚙️</span>설정</button>
+  <button data-v="set" onclick="goTab(this)"><span class="ico">⚙️</span>설정</button>
 </nav>
 <main>
-    <section class="view" id="view-ledger">
+    <section class="view on" id="view-ledger">
     <div class="section-title"><h2>평가 관리대장</h2><span>Evaluation Ledger</span></div>
     <div id="ledgerBoard">
     <h3 class="led-h">연간 평가일정 <span class="muted" style="font-weight:600">· 다음 평가 3분기 D-15</span></h3>
@@ -443,7 +443,7 @@ table.matrix tr:last-child td{border-bottom:none}
     <p class="muted" style="margin-top:10px">선택 분기의 공정별 Level입니다. 사분원 = 해당 공정 Level.</p>
   </section>
 
-  <section class="view on" id="view-set">
+  <section class="view" id="view-set">
     <div class="section-title"><h2>설정</h2><span id="setUserTag">김상기 · 마스터관리자</span></div>
     <div class="card set-block">
       <h3 style="margin-top:0">Supabase 연동</h3>
@@ -475,7 +475,7 @@ table.matrix tr:last-child td{border-bottom:none}
      <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W260105&#39;)">삭제</button></div></div>
       <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openWorkerModal()">+ 작업자 추가</button>
 
-      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-28b</span></h3>
+      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-28c</span></h3>
       <div id="alarmInfo"><div class="alarm-next hot">
     다음 정기 평가: <b>3분기</b> · 2026-09-14 <span class="dd">D-15</span>
     <div class="muted" style="font-size:11.5px;margin-top:3px">평가일 기준: 1분기 3/15 · 2분기 6/15 · 3분기 9/15 · 4분기 12/15 (매년 반복)</div>
@@ -1504,6 +1504,8 @@ function refreshAll(){
   fillLoginNames();
   const saved=sessionStorage.getItem('skill_me');
   if(saved){ ME=JSON.parse(saved); enterApp(); }
+  else{ ME=null; document.getElementById('loginView').style.display='';
+        document.getElementById('appView').style.display='none'; }
   syncNow(false);
   setInterval(()=>syncNow(false),60000);
 })();
