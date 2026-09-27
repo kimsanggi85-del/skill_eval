@@ -13,10 +13,10 @@
   --ok:#3f9142;--danger:#d64545;--hi:#3f9142;--mid:#e8940a;--lo:#d64545;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:'Pretendard Variable',Pretendard,-apple-system,'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5;padding-bottom:76px}
+body{font-family:'Pretendard Variable',Pretendard,-apple-system,'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5;padding-bottom:24px}
 button{font-family:inherit;cursor:pointer;border:none;background:none}
 input,select,textarea{font-family:inherit;font-size:15px}
-header{background:var(--ink);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between}
+header{background:var(--ink);color:#fff;padding:14px 16px;position:relative;z-index:50;display:flex;align-items:center;justify-content:space-between}
 header #backBtn{display:none;color:#fff;font-size:30px;line-height:1;width:34px;height:34px;margin:-4px 4px -4px -6px;border-radius:9px;flex-shrink:0;align-items:center;justify-content:center}
 header #backBtn.on{display:flex}
 header #backBtn:active{background:rgba(255,255,255,.15)}
@@ -46,7 +46,7 @@ header .sync .dot.err{background:#ff8a8a}
 .btn-danger{background:var(--danger);color:#fff}
 .btn-sm{padding:8px 12px;font-size:13px;border-radius:8px}
 .btn:disabled{opacity:.4;cursor:default}
-nav.tabbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:60}
+nav.tabbar{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);display:flex;z-index:55;box-shadow:0 2px 6px rgba(22,34,46,.06)}
 nav.tabbar button{flex:1;padding:10px 4px 12px;font-size:11px;color:var(--steel);display:flex;flex-direction:column;align-items:center;gap:3px}
 nav.tabbar button .ico{font-size:19px;line-height:1}
 nav.tabbar button.on{color:var(--amber);font-weight:700}
@@ -165,7 +165,7 @@ table.ledger .ld-no{color:#c8d0d8}
 .eval-summary{background:var(--amber-soft);border:1px solid #f3d9a8;border-radius:12px;padding:14px;margin:12px 0;font-size:14px}
 .eval-summary b{font-size:16px}
 .score-big{font-size:30px;font-weight:800;letter-spacing:-1px}
-.sticky-actions{position:sticky;bottom:70px;display:flex;gap:8px;padding:8px 0;background:linear-gradient(transparent,var(--paper) 40%)}
+.sticky-actions{position:sticky;bottom:10px;display:flex;gap:8px;padding:8px 0;background:linear-gradient(transparent,var(--paper) 40%)}
 .sticky-actions .btn{flex:1}
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center}
@@ -203,7 +203,7 @@ table.matrix tr:last-child td{border-bottom:none}
 .modal{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:600px;max-height:88vh;overflow-y:auto;padding:20px 18px 26px}
 .modal h3{font-size:16px;margin-bottom:14px}
 @media(min-width:600px){.modal-bg{align-items:center}.modal{border-radius:16px}}
-#toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:24px;font-size:13px;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:24px;font-size:13px;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
 #toast.on{opacity:1}
 .report-box{font-size:13px}
 .report-box table{width:100%;border-collapse:collapse;margin:8px 0}
@@ -234,6 +234,13 @@ table.matrix tr:last-child td{border-bottom:none}
 </div>
 
 <div id="appView" style="display: block;">
+<nav class="tabbar">
+  <button class="" data-v="ledger" onclick="goTab(this)"><span class="ico">📒</span>관리대장</button>
+  <button data-v="eval" onclick="goTab(this)"><span class="ico">✍️</span>평가진행</button>
+  <button data-v="dash" onclick="goTab(this)"><span class="ico">📊</span>진행현황</button>
+  <button data-v="matrix" onclick="goTab(this)"><span class="ico">🗺️</span>다기능현황</button>
+  <button data-v="set" onclick="goTab(this)" class="on"><span class="ico">⚙️</span>설정</button>
+</nav>
 <main>
     <section class="view" id="view-ledger">
     <div class="section-title"><h2>평가 관리대장</h2><span>Evaluation Ledger</span></div>
@@ -468,7 +475,7 @@ table.matrix tr:last-child td{border-bottom:none}
      <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W260105&#39;)">삭제</button></div></div>
       <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openWorkerModal()">+ 작업자 추가</button>
 
-      <h3>평가일정 알람 📅</h3>
+      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-28a</span></h3>
       <div id="alarmInfo"><div class="alarm-next hot">
     다음 정기 평가: <b>3분기</b> · 2026-09-14 <span class="dd">D-15</span>
     <div class="muted" style="font-size:11.5px;margin-top:3px">평가일 기준: 1분기 3/15 · 2분기 6/15 · 3분기 9/15 · 4분기 12/15 (매년 반복)</div>
@@ -601,13 +608,6 @@ table.matrix tr:last-child td{border-bottom:none}
   </section>
 </main>
 
-<nav class="tabbar">
-  <button class="" data-v="ledger" onclick="goTab(this)"><span class="ico">📒</span>관리대장</button>
-  <button data-v="eval" onclick="goTab(this)"><span class="ico">✍️</span>평가진행</button>
-  <button data-v="dash" onclick="goTab(this)"><span class="ico">📊</span>진행현황</button>
-  <button data-v="matrix" onclick="goTab(this)"><span class="ico">🗺️</span>다기능현황</button>
-  <button data-v="set" onclick="goTab(this)" class="on"><span class="ico">⚙️</span>설정</button>
-</nav>
 </div>
 
 <div class="modal-bg" id="workerModal">
@@ -1601,7 +1601,7 @@ async function loadAlarmRecipients(){
     const list=(rows&&rows[0]&&rows[0].recipients)||[];
     box.innerHTML=list.length?list.map(e=>`<div class="seat" style="margin-bottom:4px">📧 ${esc(e)}</div>`).join(''):'<span class="muted">등록된 수신자 없음</span>';
     const ta=document.getElementById('alarmEmails'); if(ta&&!ta.value)ta.value=list.join('\n');
-  }catch(e){ box.innerHTML='<span class="muted">확인 불가 (오프라인)</span>'; }
+  }catch(e){ box.innerHTML='<span class="muted">불러오기 실패: '+esc(String(e.message||e).slice(0,60))+'</span>'; }
 }
 function toggleAlarmEdit(on){
   if(on&&!isManager())return toast('담당자 변경은 팀장 또는 관리자만 가능합니다');
@@ -1619,9 +1619,9 @@ async function saveAlarmRecipients(){
     const r=await fetch(DB.sb.url+'/rest/v1/eval_alarm_config?id=eq.1',{method:'PATCH',
       headers:{...sbHeaders(),'Prefer':'return=minimal'},
       body:JSON.stringify({recipients:list})});
-    if(!r.ok)throw new Error(await r.text());
+    if(!r.ok){ const t=await r.text(); throw new Error('HTTP '+r.status+' '+t.slice(0,80)); }
     toast('담당자 '+list.length+'명 저장 완료'); toggleAlarmEdit(false); loadAlarmRecipients();
-  }catch(e){ toast('저장 실패 — 네트워크를 확인하세요'); }
+  }catch(e){ toast('저장 실패: '+String(e.message||e).slice(0,70)); }
 }
 async function sendTestAlarm(){
   if(!isManager())return toast('관리자만 가능합니다');
