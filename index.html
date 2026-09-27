@@ -4,7 +4,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>작업자 숙련도·작업관찰 평가 | 태진다이텍</title>
-<script src="./작업자 숙련도·작업관찰 평가 _ 태진다이텍_files/chart.umd.min.js.다운로드"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
   --ink:#16222e;--steel:#5c6b7a;--line:#dde3e9;--paper:#f5f7f9;--card:#fff;
@@ -475,7 +475,7 @@ table.matrix tr:last-child td{border-bottom:none}
      <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W260105&#39;)">삭제</button></div></div>
       <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openWorkerModal()">+ 작업자 추가</button>
 
-      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-28a</span></h3>
+      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-28b</span></h3>
       <div id="alarmInfo"><div class="alarm-next hot">
     다음 정기 평가: <b>3분기</b> · 2026-09-14 <span class="dd">D-15</span>
     <div class="muted" style="font-size:11.5px;margin-top:3px">평가일 기준: 1분기 3/15 · 2분기 6/15 · 3분기 9/15 · 4분기 12/15 (매년 반복)</div>
@@ -646,6 +646,7 @@ function currentQuarter(){ const mo=new Date().getMonth()+1; return mo<=3?'Q1':m
 // 분기별 정기 숙련도 평가일 (매년 반복) — 15일 전부터 앱 배너 + 메일 알람(GitHub Actions)
 const EVAL_SCHEDULE={Q1:'03-15',Q2:'06-15',Q3:'09-15',Q4:'12-15'};
 const EVAL_ALERT_DAYS=15;
+function ymdLocal(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function nextEvalInfo(){
   const now=new Date(); now.setHours(0,0,0,0);
   const cand=[];
@@ -1012,7 +1013,7 @@ function renderAlerts(){
   if(nx.dday<=EVAL_ALERT_DAYS){
     const dtxt=nx.dday===0?'오늘':'D-'+nx.dday;
     alerts.push({c:nx.dday<=3?'warn':'pend',i:'📅',
-      t:`<b>${Q_LABEL[nx.q]} 정기 숙련도 평가 ${dtxt}</b> — ${nx.date.toISOString().slice(0,10)} 예정. 평가 준비(대상자·표준류 확인)를 진행하세요.`});
+      t:`<b>${Q_LABEL[nx.q]} 정기 숙련도 평가 ${dtxt}</b> — ${ymdLocal(nx.date)} 예정. 평가 준비(대상자·표준류 확인)를 진행하세요.`});
   }
   if(LIST_MODE==='skill'){
     const evs=DB.workers.map(wk=>latestEval(wk.id,'skill',{quarter:CUR_Q}));
@@ -1337,11 +1338,12 @@ function renderDash(){
   }).join('');
   const dist=[0,0,0,0];
   evs.forEach(e=>{if(e&&e.status==='approved'&&e.overall)dist[e.overall-1]++;});
-  if(lvChartObj)lvChartObj.destroy();
+  if(typeof Chart==='undefined'){ console.warn('Chart.js 미로드 — 차트 생략'); }
+  else{ if(lvChartObj)lvChartObj.destroy();
   lvChartObj=new Chart(document.getElementById('lvChart'),{type:'bar',
     data:{labels:['Lv.1 초보자','Lv.2 보통','Lv.3 잘함','Lv.4 지도가능'],
       datasets:[{data:dist,backgroundColor:['#d64545','#e8940a','#3f9142','#1f5fa8'],borderRadius:6}]},
-    options:{plugins:{legend:{display:false}},maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+    options:{plugins:{legend:{display:false}},maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}}); }
   const pend=DB.evals.filter(e=>e.status==='submitted'&&e.year===YEAR);
   document.getElementById('pendCnt').textContent=pend.length+'건';
   document.getElementById('approveList').innerHTML=pend.length?pend.map(e=>{
@@ -1494,7 +1496,8 @@ function refreshAll(){
   if(!ME)return;
   const fl=document.getElementById('fLine'), keep=fl.value;
   fl.innerHTML='<option value="">전체 라인</option>'+LINES.map(l=>`<option>${l}</option>`).join(''); fl.value=keep;
-  renderQTabs(); renderWorkerList(); renderDash(); renderMatrix(); renderWkAdmin(); renderMemAdmin(); renderAlarmInfo(); renderLedger();
+  [renderQTabs,renderWorkerList,renderDash,renderMatrix,renderWkAdmin,renderMemAdmin,renderAlarmInfo,renderLedger]
+    .forEach(fn=>{ try{ fn(); }catch(e){ console.error('[화면갱신 오류] '+fn.name, e); } });
 }
 (function init(){
   load();
@@ -1587,7 +1590,7 @@ function renderAlarmInfo(){
   const nx=nextEvalInfo();
   const dtxt=nx.dday===0?'오늘':'D-'+nx.dday;
   el.innerHTML=`<div class="alarm-next ${nx.dday<=EVAL_ALERT_DAYS?'hot':''}">
-    다음 정기 평가: <b>${Q_LABEL[nx.q]||nx.q}</b> · ${nx.date.toISOString().slice(0,10)} <span class="dd">${dtxt}</span>
+    다음 정기 평가: <b>${Q_LABEL[nx.q]||nx.q}</b> · ${ymdLocal(nx.date)} <span class="dd">${dtxt}</span>
     <div class="muted" style="font-size:11.5px;margin-top:3px">평가일 기준: 1분기 3/15 · 2분기 6/15 · 3분기 9/15 · 4분기 12/15 (매년 반복)</div>
   </div>`;
   loadAlarmRecipients();
