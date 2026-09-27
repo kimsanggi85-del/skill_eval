@@ -475,12 +475,12 @@ table.matrix tr:last-child td{border-bottom:none}
      <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W260105&#39;)">삭제</button></div></div>
       <button id="wkAddBtn" class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openWorkerModal()">+ 작업자 추가</button>
 
-      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-28d</span></h3>
+      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-28e</span></h3>
       <div id="alarmInfo"><div class="alarm-next hot">
     다음 정기 평가: <b>3분기</b> · 2026-09-14 <span class="dd">D-15</span>
     <div class="muted" style="font-size:11.5px;margin-top:3px">평가일 기준: 1분기 3/15 · 2분기 6/15 · 3분기 9/15 · 4분기 12/15 (매년 반복)</div>
   </div></div>
-      <p class="muted" style="margin:8px 0 6px"><b style="color:var(--ok)">✅ 자동 메일 알람 작동 중</b> — 서버(Supabase)가 매일 08:00에 확인하여 평가일 <b>15일·7일·1일 전과 당일</b>에 메일을 발송합니다. 앱을 켜두지 않아도 동작합니다.</p>
+      <p class="muted" style="margin:8px 0 6px"><b style="color:var(--ok)">✅ 자동 메일 알람 작동 중</b> — 서버(Supabase)가 매일 08:00에 확인하여, 분기 평가일 <b>15일 전부터 해당 분기 평가가 전원 승인완료될 때까지 매일</b> 메일을 발송합니다. 평가일이 지나도 미완료면 계속 발송되며(지연 D+N 표시), 메일에 미평가·승인대기 명단이 포함됩니다. 앱을 켜두지 않아도 동작합니다.</p>
       <div class="alarm-guide">
         <div style="font-size:12.5px;font-weight:800;color:var(--steel);margin-bottom:8px">알림 받는 담당자</div>
         <div id="alarmList"><span class="muted">불러오는 중…</span></div>
@@ -647,6 +647,19 @@ function currentQuarter(){ const mo=new Date().getMonth()+1; return mo<=3?'Q1':m
 const EVAL_SCHEDULE={Q1:'03-15',Q2:'06-15',Q3:'09-15',Q4:'12-15'};
 const EVAL_ALERT_DAYS=15;
 function ymdLocal(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+// 알림 대상 분기: 평가일 15일 전이 지났고 아직 전원 승인완료가 아닌 분기 (서버 메일 규칙과 동일)
+function pendingEvalQuarters(){
+  const now=new Date(); now.setHours(0,0,0,0);
+  const y=now.getFullYear(), out=[];
+  for(const q of Object.keys(EVAL_SCHEDULE)){
+    const d=new Date(y+'-'+EVAL_SCHEDULE[q]+'T00:00:00');
+    const start=new Date(d.getTime()-EVAL_ALERT_DAYS*86400000);
+    if(now<start)continue;
+    const done=DB.workers.filter(wk=>DB.evals.some(e=>e.type==='skill'&&e.workerId===wk.id&&Number(e.year)===y&&e.quarter===q&&e.status==='approved')).length;
+    if(done<DB.workers.length) out.push({q,date:d,dday:Math.round((d-now)/86400000),done,total:DB.workers.length});
+  }
+  return out;
+}
 function nextEvalInfo(){
   const now=new Date(); now.setHours(0,0,0,0);
   const cand=[];
@@ -1008,13 +1021,13 @@ function renderWorkerList(){
 function renderAlerts(){
   const bar=document.getElementById('alertBar'); if(!bar)return;
   const alerts=[]; const total=DB.workers.length;
-  // 평가일정 D-day 알람 (15일 전부터)
-  const nx=nextEvalInfo();
-  if(nx.dday<=EVAL_ALERT_DAYS){
-    const dtxt=nx.dday===0?'오늘':'D-'+nx.dday;
-    alerts.push({c:nx.dday<=3?'warn':'pend',i:'📅',
-      t:`<b>${Q_LABEL[nx.q]} 정기 숙련도 평가 ${dtxt}</b> — ${ymdLocal(nx.date)} 예정. 평가 준비(대상자·표준류 확인)를 진행하세요.`});
-  }
+  // 평가일정 알람: 평가일 15일 전부터 전원 승인완료 시까지 (지연 시 경고)
+  pendingEvalQuarters().forEach(p=>{
+    const late=p.dday<0;
+    const dtxt=p.dday>0?'D-'+p.dday:p.dday===0?'오늘':'지연 D+'+(-p.dday);
+    alerts.push({c:(late||p.dday<=3)?'warn':'pend',i:late?'⏰':'📅',
+      t:`<b>${Q_LABEL[p.q]} 정기 숙련도 평가 ${dtxt}</b> — ${ymdLocal(p.date)} ${late?'평가일 경과, 조속히 완료하세요.':'예정.'} 승인완료 <b>${p.done}/${p.total}</b>명 (완료 시까지 매일 메일 발송)`});
+  });
   if(LIST_MODE==='skill'){
     const evs=DB.workers.map(wk=>latestEval(wk.id,'skill',{quarter:CUR_Q}));
     const notDone=evs.filter(e=>!e||e.status==='none'||e.status==='draft').length;
