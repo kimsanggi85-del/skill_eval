@@ -473,9 +473,9 @@ table.matrix tr:last-child td{border-bottom:none}
      <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W240701&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>서희정</b> <small>241021 · Raceway · 설비운용 및 생산</small></div>
      <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W241021&#39;)">삭제</button></div><div class="wk-admin-row"><div class="grow"><b>김고은</b> <small>260105 · Raceway · 설비운용 및 생산</small></div>
      <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W260105&#39;)">삭제</button></div></div>
-      <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openWorkerModal()">+ 작업자 추가</button>
+      <button id="wkAddBtn" class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openWorkerModal()">+ 작업자 추가</button>
 
-      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-28c</span></h3>
+      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-28d</span></h3>
       <div id="alarmInfo"><div class="alarm-next hot">
     다음 정기 평가: <b>3분기</b> · 2026-09-14 <span class="dd">D-15</span>
     <div class="muted" style="font-size:11.5px;margin-top:3px">평가일 기준: 1분기 3/15 · 2분기 6/15 · 3분기 9/15 · 4분기 12/15 (매년 반복)</div>
@@ -612,14 +612,14 @@ table.matrix tr:last-child td{border-bottom:none}
 
 <div class="modal-bg" id="workerModal">
   <div class="modal">
-    <h3>작업자 추가</h3>
+    <h3 id="wkModalTitle">작업자 추가</h3>
     <div class="field"><label>이름</label><input id="nwName"></div>
     <div class="field"><label>사번</label><input id="nwEmp" placeholder="예: 260105"></div>
     <div class="field"><label>라인</label><select id="nwLine"></select></div>
     <div class="field"><label>담당 공정</label><select id="nwProc"></select></div>
     <div style="display:flex;gap:8px;margin-top:6px">
       <button class="btn btn-ghost" style="flex:1" onclick="closeModal(&#39;workerModal&#39;)">취소</button>
-      <button class="btn btn-primary" style="flex:1" onclick="addWorker()">추가</button>
+      <button id="wkModalBtn" class="btn btn-primary" style="flex:1" onclick="saveWorkerModal()">추가</button>
     </div>
   </div>
 </div>
@@ -1423,26 +1423,53 @@ function renderProcMatrix(){
 }
 
 /* ═══ 설정 ═══ */
+let WK_EDIT_ID=null;
 function renderWkAdmin(){
+  const can=isManager();
   document.getElementById('wkCount').textContent='('+DB.workers.length+'명)';
+  const ab=document.getElementById('wkAddBtn'); if(ab)ab.style.display=can?'':'none';
   document.getElementById('wkAdmin').innerHTML=DB.workers.map(wk=>
     `<div class="wk-admin-row"><div class="grow"><b>${esc(wk.name)}</b> <small>${esc(wk.emp)} · ${esc(wk.line)} · ${esc(wk.proc)}</small></div>
-     <button class="btn btn-ghost btn-sm" onclick="delWorker('${wk.id}')">삭제</button></div>`).join('');
+     ${can?`<button class="btn btn-ghost btn-sm" onclick="openWorkerModal('${wk.id}')">수정</button>
+     <button class="btn btn-ghost btn-sm" onclick="delWorker('${wk.id}')">삭제</button>`:''}</div>`).join('')
+    +(can?'':'<p class="muted" style="margin-top:6px">작업자 추가·수정·삭제는 팀장·관리자만 가능합니다.</p>');
 }
-function openWorkerModal(){
+function openWorkerModal(id){
+  if(!isManager())return toast('작업자 관리는 팀장·관리자만 가능합니다');
+  WK_EDIT_ID=id||null;
+  const wk=id?DB.workers.find(x=>x.id===id):null;
   document.getElementById('nwLine').innerHTML=LINES.map(l=>`<option>${l}</option>`).join('');
   document.getElementById('nwProc').innerHTML=PROCESSES.map(p=>`<option>${p}</option>`).join('');
+  document.getElementById('nwName').value=wk?wk.name:'';
+  document.getElementById('nwEmp').value=wk?wk.emp:'';
+  if(wk){ document.getElementById('nwLine').value=wk.line; document.getElementById('nwProc').value=wk.proc; }
+  document.getElementById('wkModalTitle').textContent=wk?'작업자 수정':'작업자 추가';
+  document.getElementById('wkModalBtn').textContent=wk?'저장':'추가';
   document.getElementById('workerModal').classList.add('on');
 }
-function addWorker(){
+function saveWorkerModal(){
+  if(!isManager())return toast('작업자 관리는 팀장·관리자만 가능합니다');
   const name=document.getElementById('nwName').value.trim(), emp=document.getElementById('nwEmp').value.trim();
+  const line=document.getElementById('nwLine').value, proc=document.getElementById('nwProc').value;
   if(!name||!emp)return toast('이름과 사번을 입력하세요');
-  if(DB.workers.some(x=>x.emp===emp))return toast('이미 등록된 사번입니다');
-  DB.workers.push(w(name,emp,document.getElementById('nwLine').value,document.getElementById('nwProc').value));
-  save(); closeModal('workerModal'); toast('작업자 추가 완료');
-  document.getElementById('nwName').value='';document.getElementById('nwEmp').value='';
+  if(DB.workers.some(x=>x.emp===emp&&x.id!==WK_EDIT_ID))return toast('이미 등록된 사번입니다');
+  if(WK_EDIT_ID){
+    const wk=DB.workers.find(x=>x.id===WK_EDIT_ID); if(!wk)return;
+    // id는 유지 → 기존 평가 이력 그대로 연결
+    wk.name=name; wk.emp=emp; wk.line=line; wk.proc=proc;
+    toast(name+' 정보 수정 완료');
+  }else{
+    const nw=w(name,emp,line,proc);
+    if(DB.workers.some(x=>x.id===nw.id))nw.id='W'+emp+'_'+Date.now().toString(36);
+    DB.workers.push(nw); toast('작업자 추가 완료');
+  }
+  WK_EDIT_ID=null; save(); closeModal('workerModal');
 }
-function delWorker(id){ if(!confirm('작업자와 평가 이력을 삭제할까요?'))return;
+function addWorker(){ WK_EDIT_ID=null; saveWorkerModal(); }
+function delWorker(id){
+  if(!isManager())return toast('작업자 관리는 팀장·관리자만 가능합니다');
+  const wk=DB.workers.find(x=>x.id===id);
+  if(!confirm((wk?wk.name+' ':'')+'작업자와 평가 이력을 삭제할까요?'))return;
   DB.workers=DB.workers.filter(x=>x.id!==id); DB.evals=DB.evals.filter(e=>e.workerId!==id); save(); toast('삭제 완료'); }
 function renderMemAdmin(){
   const nL=DB.members.filter(x=>x.role==='leader').length, nA=DB.members.filter(x=>x.role==='admin').length;
