@@ -220,6 +220,12 @@ table.matrix tr:last-child td{border-bottom:none}
 .worker-row.out{opacity:.62}
 .badge.out{background:#eef1f4;color:#6b7785}
 table.ledger .ld-out{color:#9aa6b2;font-size:11px;background:#f7f8fa}
+.prefill-note{background:#eaf2fb;border:1px solid #c3d9f0;color:#1a4a80;border-radius:11px;padding:10px 13px;font-size:13px;line-height:1.55;margin:0 0 12px}
+.prefill-note .pf-chg{display:inline-block;margin:0 6px;padding:1px 8px;border-radius:9px;background:#fff;font-size:11.5px;font-weight:700}
+.score-grid .sc.prev{border-style:dashed;border-color:#7aa3cf}
+.score-grid .sc.prev .t{color:#4a7bb0}
+.sc-prev{margin-right:10px;color:#4a7bb0;font-size:11.5px}
+.sc-prev .up{color:var(--ok)} .sc-prev .dn{color:var(--danger)}
 </style>
 </head>
 <body>
@@ -484,7 +490,7 @@ table.ledger .ld-out{color:#9aa6b2;font-size:11px;background:#f7f8fa}
      <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W260105&#39;)">삭제</button></div></div>
       <button id="wkAddBtn" class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openWorkerModal()">+ 작업자 추가</button>
 
-      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-30d</span></h3>
+      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-30e</span></h3>
       <div id="alarmInfo"><div class="alarm-next hot">
     다음 정기 평가: <b>3분기</b> · 2026-09-14 <span class="dd">D-15</span>
     <div class="muted" style="font-size:11.5px;margin-top:3px">평가일 기준: 1분기 3/15 · 2분기 6/15 · 3분기 9/15 · 4분기 12/15 (매년 반복)</div>
@@ -776,6 +782,14 @@ function autoSkillComment(ev){
   let s=LEAD[lv]||LEAD[0];
   if(weak.length) s+=` 보완 필요: ${weak.join(', ')}.`;
   else if(minor.length) s+=` 경미 감점 ${minor.length}개 항목(${minor.join(', ')}) — 현 수준 유지 요망.`;
+  if(ev.prev){
+    const up=[],dn=[];
+    ev.ans.forEach((a,i)=>{ const p=ev.prev.ans[i]; if(typeof a!=='number'||typeof p!=='number'||a===p)return;
+      (a>p?up:dn).push(`${SKILL_SHORT[i]||SKILL_FLAT[i].q}(${p}→${a})`); });
+    const ql=`${Q_LABEL[ev.prev.quarter]||ev.prev.quarter}`;
+    if(!up.length&&!dn.length) s+=` 전 분기(${ql}) 대비 변동 없음(평가자 현장 확인).`;
+    else{ if(up.length) s+=` 전 분기(${ql}) 대비 향상: ${up.join(', ')}.`; if(dn.length) s+=` 하락: ${dn.join(', ')}.`; }
+  }
   if(weak.length||lv<=2) s+=' 차기 분기 재평가 시 보완 여부 확인.';
   return s;
 }
@@ -1188,6 +1202,23 @@ function renderAlerts(){
 function jumpFilter(st){ document.getElementById('fStatus').value=st==='none'?'none':st; renderWorkerList(); document.getElementById('workerList').scrollIntoView({behavior:'smooth',block:'start'}); }
 
 /* ═══ 평가 시작/작성 ═══ */
+/* ═══ 전 분기 점수 불러오기 ═══
+   새 평가 시작 시 직전 승인 평가 점수를 미리 채움 → 평가자가 현장 확인 후 달라진 항목만 수정
+   (같은 분기 재평가면 그 분기 승인 점수를 불러옴) */
+function prevSkillEval(wid,q,y){
+  const qi=QUARTERS.indexOf(q);
+  const c=DB.evals.filter(e=>e.type==='skill'&&e.workerId===wid&&e.status==='approved'&&Array.isArray(e.ans)
+    &&(Number(e.year)<y||(Number(e.year)===y&&QUARTERS.indexOf(e.quarter)<=qi)));
+  c.sort((a,b)=>(b.year-a.year)||(QUARTERS.indexOf(b.quarter)-QUARTERS.indexOf(a.quarter))||((b.updated||'')>(a.updated||'')?1:-1));
+  return c[0]||null;
+}
+function clearPrefill(){
+  if(!curEval)return;
+  if(!confirm('불러온 점수를 모두 지우고 빈 양식으로 시작할까요?'))return;
+  curEval.ans=SKILL_FLAT.map(()=>null); delete curEval.prev;
+  curEval.comment=''; curEval.commentAuto=undefined;
+  curEval.updated=new Date().toISOString(); save(false); renderSkillForm();
+}
 function startEval(wid){
   if(!canEvaluate())return toast('평가는 강창구·김상기·강병주만 가능합니다');
   { const w0=DB.workers.find(x=>x.id===wid);
@@ -1200,6 +1231,11 @@ function startEval(wid){
       ev={id:'S'+Date.now(),type:'skill',workerId:wid,year:YEAR,quarter:CUR_Q,proc:wk.proc,
           ans:Array(SKILL_FLAT.length).fill(null),score:null,overall:null,
           status:'draft',evaluator:ME.name,evalDate:null,approver:null,approveDate:null,comment:'',updated:new Date().toISOString()};
+      const pv=prevSkillEval(wid,CUR_Q,YEAR);
+      if(pv){
+        ev.ans=SKILL_FLAT.map((it,i)=>{ const a=pv.ans[i]; return typeof a==='number'?Math.min(a,it.opts[0][1]):null; });
+        ev.prev={id:pv.id,year:Number(pv.year),quarter:pv.quarter,score:pv.score,ans:ev.ans.slice()}; ev.sv=2;
+      }
     }else{
       ev={id:'O'+Date.now(),type:'obs',workerId:wid,year:YEAR,proc:wk.proc,
           marks:OBS_ITEMS.map(()=>Array(OBS_ROUNDS).fill(null)),defect:false,
@@ -1230,20 +1266,22 @@ function renderSkillForm(){
     grp.items.forEach(it=>{
       const gi=idx;
       const cur=ev.ans[gi], mx=it.opts[0][1];
+      const pa=ev.prev&&typeof ev.prev.ans[gi]==='number'?ev.prev.ans[gi]:null;
       // 기준 안내 (점수별 판정 기준)
       const hint=it.opts.map(o=>`<span class="ch"><b>${o[1]}점</b> ${esc(o[0])}</span>`).join('');
       // 점수 칸: 0 ~ 만점 (1점 단위)
       const cells=Array.from({length:mx+1},(_,v)=>{
         const on=(cur===v)?'on':'';
         const tag=it.opts.find(o=>o[1]===v);   // 기준 점수면 라벨 표시
-        return `<button class="sc ${on}" onclick="ansSkill(${gi},${v})">
-          <span class="n">${v}</span><span class="t">${tag?'기준':''}</span></button>`;
+        const pv=(pa===v)?'prev':'';
+        return `<button class="sc ${on} ${pv}" onclick="ansSkill(${gi},${v})">
+          <span class="n">${v}</span><span class="t">${pa===v?'전분기':(tag?'기준':'')}</span></button>`;
       }).join('');
       body+=`<div class="q-item"><div class="q-text">${esc(it.q)}</div>
         <div class="q-way">확인방법: ${esc(it.way)}</div>
         <div class="crit-hint">${hint}</div>
         <div class="score-grid">${cells}</div>
-        <div class="sc-now">부여 점수 <b>${cur!=null?cur:'-'}</b> / ${mx}점 ${cur!=null?`<span class="sc-jd">${esc(itemGrade(gi,cur))}</span>`:''}</div>
+        <div class="sc-now">${pa!=null?`<span class="sc-prev">전 분기 ${pa}점${cur!=null&&cur!==pa?(cur>pa?` <b class="up">▲${cur-pa}</b>`:` <b class="dn">▼${pa-cur}</b>`):''}</span>`:''}부여 점수 <b>${cur!=null?cur:'-'}</b> / ${mx}점 ${cur!=null?`<span class="sc-jd">${esc(itemGrade(gi,cur))}</span>`:''}</div>
       </div>`;
       idx++;
     });
@@ -1252,6 +1290,9 @@ function renderSkillForm(){
   document.getElementById('view-form').innerHTML=`
     <div class="eval-head"><b>${esc(wk.name)}</b> <span style="font-size:13px;color:#cfe0f0">${esc(wk.emp)}</span>
       <div class="meta">${esc(wk.line)} · ${esc(wk.proc)} · ${YEAR}년 ${Q_LABEL[ev.quarter]||''} 숙련도 평가 · 평가자 ${esc(ev.evaluator)}</div></div>
+    ${ev.prev?`<div class="prefill-note">📋 <b>${ev.prev.year}년 ${Q_LABEL[ev.prev.quarter]} 평가(${ev.prev.score}점)</b> 점수를 불러왔습니다. 현장 확인 후 <b>달라진 항목만</b> 수정하세요.
+      <span class="pf-chg">변경 ${ev.ans.filter((a,i)=>a!==ev.prev.ans[i]).length}개 항목</span>
+      <button type="button" class="cm-re" onclick="clearPrefill()">빈 양식으로 시작</button></div>`:''}
     ${body}
     <div class="eval-summary" style="text-align:center">
       종합점수 <span class="score-big" style="color:${lv?LV_META[lv].c:'var(--steel)'}">${done?score:'-'}</span> / 100
@@ -1395,6 +1436,8 @@ function submitEval(){
   const ev=curEval;
   const cm=document.getElementById('evComment'); if(cm)ev.comment=cm.value;
   const rcm=document.getElementById('reComment'); if(rcm)ev.reComment=rcm.value;
+  if(ev.type==='skill'&&ev.prev&&ev.ans.every((a,i)=>a===ev.prev.ans[i])
+     &&!confirm('전 분기와 모든 항목 점수가 같습니다.\n현장에서 확인하신 결과가 맞습니까?'))return;
   if(ev.type==='skill'){ ev.score=skillTotal(ev.ans); ev.overall=skillLevel(ev.score); applyAutoComment(ev,autoSkillComment(ev)); }
   else if(!ev.reMarks){ applyAutoComment(ev,autoObsComment(ev)); }
   else{ ev.result=obsCount(ev.marks); if(ev.reMarks)ev.reResult=obsCount(ev.reMarks); }
