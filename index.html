@@ -211,6 +211,10 @@ table.matrix tr:last-child td{border-bottom:none}
 .report-box th{background:var(--paper)}
 .muted{color:var(--steel);font-size:12px}
 .empty{text-align:center;color:var(--steel);padding:34px 10px;font-size:13px}
+.cm-tag{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:9px;background:var(--paper);color:var(--steel)}
+.cm-tag.on{background:#e7f2e8;color:var(--ok)}
+.cm-tag.edit{background:var(--amber-soft);color:#8a5a0a}
+.cm-re{font-size:11px;font-weight:700;color:var(--blue,#1f5fa8);text-decoration:underline;background:none;padding:0}
 </style>
 </head>
 <body>
@@ -475,7 +479,7 @@ table.matrix tr:last-child td{border-bottom:none}
      <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W260105&#39;)">삭제</button></div></div>
       <button id="wkAddBtn" class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openWorkerModal()">+ 작업자 추가</button>
 
-      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-28e</span></h3>
+      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-30b</span></h3>
       <div id="alarmInfo"><div class="alarm-next hot">
     다음 정기 평가: <b>3분기</b> · 2026-09-14 <span class="dd">D-15</span>
     <div class="muted" style="font-size:11.5px;margin-top:3px">평가일 기준: 1분기 3/15 · 2분기 6/15 · 3분기 9/15 · 4분기 12/15 (매년 반복)</div>
@@ -731,6 +735,63 @@ function obsJudge(H,M,L){
 const TRAIN_METHODS=['OJT (현장지도)','집합교육','개별 지도','표준류 재숙지','외부교육'];
 function blankTraining(){ return {reason:'',weak:[],date:'',hours:'',trainer:'',method:TRAIN_METHODS[0],content:'',material:'',verify:'',reobsDate:'',done:false,doneDate:'',approver:'',approveDate:''}; }
 // 특정 회차(마지막 완료회차) 기준 취약항목(하/중) 인덱스 추출
+/* ═══ 평가자 의견 자동 작성 ═══
+   점수 입력 시 Level·감점 항목으로 의견을 자동 작성. 평가자가 직접 고친 의견은 덮어쓰지 않음 */
+const SKILL_SHORT=['설비 사용방법','일상점검 기록','양/불량 판별','검사기준 숙지','제품 명칭·형상','작업표준서 숙지','형번 변경 확인',
+  '외관검사 기준','작업표준 일치','자주검사 기준','부적합품 처리','치공구 정위치','자재 정위치','불용품 관리','작업환경 청결',
+  '공정이상 대처','순간정지 복귀','생산 목표 달성','부적합 발생 수량'];
+const OBS_SHORT=['설비 사용방법','양/불량 판별','제품 명칭·형상','작업표준 일치','치공구 정위치','자재 정위치','불용품 관리','작업환경 청결','공정이상 조치'];
+const OLD_STD_CMT=/Level Up 교육 대상 항목 존재|단독작업 가능 수준 도달|전 평가항목 우수 수준|초기 숙련 단계로|기본 작업은 수행 가능하나|초기 관찰 \d차 (조기해제|해제기준)/;
+function autoSkillComment(ev){
+  if(!skillDone(ev.ans))return '';
+  const sc=skillTotal(ev.ans), lv=skillLevel(sc);
+  const LEAD={
+    4:(sc>=100?`종합 ${sc}점 Lv.4(지도가능) — 전 항목 우수 수준으로 숙지·실행하며 표준 준수가 철저함. 신규자 OJT 지도 가능.`
+       :`종합 ${sc}점 Lv.4(지도가능) — 전반적으로 우수한 수준이며 신규자 OJT 지도 가능.`),
+    3:`종합 ${sc}점 Lv.3(잘함) — 단독작업 가능 수준. 작업표준·자주검사 준수 양호.`,
+    2:`종합 ${sc}점 Lv.2(보통) — 기본 작업은 수행 가능하나 일부 항목 미흡. Level Up 교육 대상.`,
+    1:`종합 ${sc}점 Lv.1(초보자) — 작업표준 재숙지 필요. 재교육 실시 후 재평가.`,
+    0:`종합 ${sc}점 — 평가 기준(60점) 미달. 단독작업 불가, 재교육 후 재평가 필수.`};
+  const weak=[], minor=[];
+  ev.ans.forEach((a,i)=>{ const mx=SKILL_FLAT[i].opts[0][1]; if(typeof a!=='number'||a>=mx)return;
+    const t=`${SKILL_SHORT[i]||SKILL_FLAT[i].q}(${a}/${mx})`; (a/mx<0.8?weak:minor).push(t); });
+  let s=LEAD[lv]||LEAD[0];
+  if(weak.length) s+=` 보완 필요: ${weak.join(', ')}.`;
+  else if(minor.length) s+=` 경미 감점 ${minor.length}개 항목(${minor.join(', ')}) — 현 수준 유지 요망.`;
+  if(weak.length||lv<=2) s+=' 차기 분기 재평가 시 보완 여부 확인.';
+  return s;
+}
+function autoObsComment(ev){
+  const c=obsCount(ev.marks); if(!c)return '';
+  const w=weakItemsFromMarks(ev.marks).map(x=>`${OBS_SHORT[x.i]||OBS_ITEMS[x.i].q}(${x.grade==='L'?'하':'중'})`);
+  const head=`${c.round}차 관찰 상${c.H}·중${c.M}·하${c.L}`;
+  if(ev.defect) return `${head}, 관찰기간 중 작업자 불량 발생 — 해제 불가. 원인 교육 후 재관찰.${w.length?' 취약: '+w.join(', ')+'.':''}`;
+  if(c.judge.ok&&c.judge.early) return `${head} — 조기해제 기준 충족. 단독작업 배치 가능.${w.length?' 참고: '+w.join(', ')+'.':''}`;
+  if(c.judge.ok) return `${head} — 해제기준 충족. 단독작업 배치 가능.${w.length?' 보완 권장: '+w.join(', ')+'.':''}`;
+  if(c.round>=OBS_ROUNDS) return `${head} — 5차 관찰 해제기준 미충족. 재교육 후 재관찰 실시.${w.length?' 취약: '+w.join(', ')+'.':''}`;
+  return `${head} — 해제기준 미충족, 관찰 계속.${w.length?' 중점 지도: '+w.join(', ')+'.':''}`;
+}
+// 의견이 비었거나 이전 자동 의견 그대로면 새 자동 의견으로 갱신
+function applyAutoComment(ev,auto){
+  const cur=(ev.comment||'').trim();
+  const isAuto= !cur || (ev.commentAuto!==undefined ? cur===ev.commentAuto.trim() : OLD_STD_CMT.test(cur));
+  if(isAuto){ ev.comment=auto; ev.commentAuto=auto; }
+  return isAuto;
+}
+function commentField(ev,auto,label){
+  const isAuto=applyAutoComment(ev,auto);
+  const tag=!auto?'<span class="cm-tag">모든 항목 입력 시 자동 작성</span>'
+    :isAuto?'<span class="cm-tag on">자동 작성됨</span>'
+    :`<span class="cm-tag edit">직접 수정됨</span> <button type="button" class="cm-re" onclick="resetAutoComment()">자동 의견으로 다시 채우기</button>`;
+  return `<div class="field"><label style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${label} ${tag}</label>
+    <textarea id="evComment" rows="3" oninput="curEval.comment=this.value">${esc(ev.comment||'')}</textarea></div>`;
+}
+function resetAutoComment(){
+  if(!curEval)return;
+  curEval.comment=''; curEval.commentAuto=undefined;
+  curEval.updated=new Date().toISOString(); save(false);
+  curEval.type==='skill'?renderSkillForm():renderObsForm();
+}
 function weakItemsFromMarks(marks){
   let last=-1; for(let r=0;r<OBS_ROUNDS;r++){ if(marks.every(it=>it[r]))last=r; }
   if(last<0)return [];
@@ -815,27 +876,78 @@ function load(){ try{DB=JSON.parse(localStorage.getItem(LS_KEY))}catch(e){} if(!
   if(!DB.evals||!DB.evals.length)DB.evals=JSON.parse(JSON.stringify(PRELOAD_EVALS));
   DB.evals.forEach(migrateSkillAns);   // 선택지 인덱스 → 점수값 자동 변환
   try{['taejin_skill_obs_v1','taejin_skill_obs_v2','taejin_skill_obs_v3','taejin_skill_obs_v4','taejin_skill_obs_v5','taejin_skill_obs_v19','taejin_skill_obs_v20','taejin_skill_eval_v1'].forEach(k=>localStorage.removeItem(k));}catch(e){} }
-function save(push=true){ localStorage.setItem(LS_KEY,JSON.stringify(DB)); if(push)sbPush(); refreshAll(); }
+/* ═══ 저장·동기화 (건별 병합) ═══
+   - 서버 데이터를 통째로 덮어쓰지 않고 평가 건별로 최신(updated)을 남겨 병합
+   - 작업자/구성원은 마지막으로 수정한 쪽(ts) 기준
+   - 저장 시: 서버 최신본을 받아 병합한 뒤 업로드 → 다른 평가자 결과도 보존 */
+function touch(sec){ DB.ts=DB.ts||{}; DB.ts[sec]=new Date().toISOString(); }
+function tomb(ids){ DB.del=DB.del||{evals:{}}; DB.del.evals=DB.del.evals||{}; const t=new Date().toISOString(); ids.forEach(id=>DB.del.evals[id]=t); }
+function mergeDB(L,R){
+  if(!R||!R.workers) return L;
+  const lt=L.ts||{}, rt=R.ts||{}, pick=(k)=>((lt[k]||'')>(rt[k]||''))?L:R;
+  const out=Object.assign({},R,{sb:L.sb});
+  out.ts=Object.assign({},rt); Object.keys(lt).forEach(k=>{ if((lt[k]||'')>(out.ts[k]||''))out.ts[k]=lt[k]; });
+  out.workers=pick('workers').workers||[];
+  out.members=pick('members').members||[];
+  const del=Object.assign({},(R.del&&R.del.evals)||{},(L.del&&L.del.evals)||{});
+  out.del={evals:del};
+  let evals;
+  if((lt.evalsAll||'')>(rt.evalsAll||'')) evals=(L.evals||[]).slice();
+  else if((rt.evalsAll||'')>(lt.evalsAll||'')) evals=(R.evals||[]).slice();
+  else{
+    const map=new Map();
+    (R.evals||[]).forEach(e=>map.set(e.id,e));
+    (L.evals||[]).forEach(e=>{ const r=map.get(e.id); if(!r||(e.updated||'')>=(r.updated||''))map.set(e.id,e); });
+    evals=[...map.values()];
+  }
+  out.evals=evals.filter(e=>!del[e.id]);
+  return out;
+}
+function rebindCur(){
+  if(!curEval)return;
+  const i=DB.evals.findIndex(e=>e.id===curEval.id);
+  if(i<0){ if(!(DB.del&&DB.del.evals&&DB.del.evals[curEval.id])) DB.evals.push(curEval); return; }
+  if(DB.evals[i]===curEval)return;
+  if((curEval.updated||'')>=(DB.evals[i].updated||'')) DB.evals[i]=curEval; else curEval=DB.evals[i];
+}
+const sig=o=>JSON.stringify([o.workers,o.members,o.evals,o.del]);
+let _pushT=null,_syncBusy=false,_syncAgain=false;
+function save(push=true){
+  localStorage.setItem(LS_KEY,JSON.stringify(DB));
+  clearTimeout(_pushT); _pushT=setTimeout(()=>syncCore(true),push?300:2500);   // 작성 중 변경도 서버에 자동 반영
+  refreshAll();
+}
 function sbHeaders(){ return {'apikey':DB.sb.key,'Authorization':'Bearer '+DB.sb.key,'Content-Type':'application/json'}; }
 function setSync(st,txt){ document.getElementById('syncDot').className='dot'+(st?' '+st:''); document.getElementById('syncTxt').textContent=txt; }
-async function sbPush(){
-  if(!DB.sb.url||!DB.sb.key){setSync('','로컬');return;}
-  try{ const r=await fetch(DB.sb.url+'/rest/v1/kv_store',{method:'POST',
-      headers:{...sbHeaders(),'Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({key:LS_KEY,value:DB,updated_at:new Date().toISOString()})});
-    setSync(r.ok?'on':'err',r.ok?'동기화됨':'동기화 오류');
-  }catch(e){setSync('err','오프라인');}
+async function fetchRemote(){
+  const r=await fetch(DB.sb.url+`/rest/v1/kv_store?key=eq.${LS_KEY}&select=value`,{headers:sbHeaders()});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const rows=await r.json(); return (rows.length&&rows[0].value)?rows[0].value:null;
 }
-async function sbPull(){
-  if(!DB.sb.url||!DB.sb.key)return false;
-  try{ const r=await fetch(DB.sb.url+`/rest/v1/kv_store?key=eq.${LS_KEY}&select=value`,{headers:sbHeaders()});
-    if(!r.ok){setSync('err','동기화 오류');return false;}
-    const rows=await r.json();
-    if(rows.length&&rows[0].value){const rm=rows[0].value;rm.sb=DB.sb;DB=rm;localStorage.setItem(LS_KEY,JSON.stringify(DB));}
-    setSync('on','동기화됨');return true;
-  }catch(e){setSync('err','오프라인');return false;}
+async function syncCore(forcePush){
+  if(!DB.sb.url||!DB.sb.key){setSync('','로컬');return false;}
+  if(_syncBusy){_syncAgain=true;return true;}
+  _syncBusy=true;
+  try{
+    const remote=await fetchRemote();
+    const merged=remote?mergeDB(DB,remote):DB;
+    merged.sb=DB.sb; DB=merged; rebindCur();
+    DB.evals.forEach(migrateSkillAns);
+    localStorage.setItem(LS_KEY,JSON.stringify(DB));
+    if(forcePush||!remote||sig(DB)!==sig(remote)){
+      const body=Object.assign({},DB); delete body.sb;
+      const r=await fetch(DB.sb.url+'/rest/v1/kv_store',{method:'POST',
+        headers:{...sbHeaders(),'Prefer':'resolution=merge-duplicates'},
+        body:JSON.stringify({key:LS_KEY,value:body,updated_at:new Date().toISOString()})});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+    }
+    setSync('on','동기화됨'); return true;
+  }catch(e){ setSync('err','동기화 오류'); return false; }
+  finally{ _syncBusy=false; if(_syncAgain){_syncAgain=false; setTimeout(()=>syncCore(true),200);} }
 }
-async function syncNow(manual){ const ok=await sbPull(); if(ok){if(!DB.members||!DB.members.length)DB.members=JSON.parse(JSON.stringify(PROD_MEMBERS)); fillLoginNames(); refreshAll();if(manual)toast('동기화 완료');} else if(manual)toast('연결 정보를 확인하세요'); }
+async function sbPush(){ return syncCore(true); }
+async function sbPull(){ return syncCore(false); }
+async function syncNow(manual){ const ok=await syncCore(false); if(ok){if(!DB.members||!DB.members.length)DB.members=JSON.parse(JSON.stringify(PROD_MEMBERS)); fillLoginNames(); refreshAll();if(manual)toast('동기화 완료');} else if(manual)toast('연결 정보를 확인하세요'); }
 function saveSb(){ DB.sb.url=document.getElementById('sbUrl').value.trim(); DB.sb.key=document.getElementById('sbKey').value.trim(); localStorage.setItem(LS_KEY,JSON.stringify(DB)); syncNow(true); }
 
 /* ═══ 로그인 ═══ */
@@ -1117,7 +1229,7 @@ function renderSkillForm(){
       &nbsp;→&nbsp; ${done?lvChip(lv):'<span class="muted">평가 미완료</span>'}
       <div class="muted" style="margin-top:6px">${done?esc(LEVEL_DESC[lv]):'모든 항목 판정 시 Level 산정'} · 90/80/70/60점 = 4/3/2/1 Level</div>
     </div>
-    <div class="field"><label>평가자 의견 (80점 이하 항목 Level Up 교육 대상 반영)</label><textarea id="evComment" rows="2">${esc(ev.comment||'')}</textarea></div>
+    ${commentField(ev,autoSkillComment(ev),'평가자 의견')}
     <div class="sticky-actions">
       <button class="btn btn-ghost" onclick="saveDraft()">임시저장</button>
       <button class="btn btn-primary" ${done?'':'disabled'} onclick="submitEval()">평가 완료 · 승인요청</button>
@@ -1171,7 +1283,7 @@ function obsSummaryHtml(ev){
     ${j.ok&&!ev.defect?`<span class="badge rel">해제 가능</span> ${j.early?'(조기해제)':'(정규 해제)'}`:'<span class="badge obs">미충족</span> — 5차 도달 시 재교육 대상'}`; }
   else s='<span class="muted">각 항목을 회차별로 평가하세요 (한 회차 전체 입력 시 판정)</span>';
   return `<div class="eval-summary">${s}<div class="muted" style="margin-top:8px">해제: 상 6↑·중 3↓·하 0·불량없음 / 조기해제: 상 8↑·중 2↓·하 0 / 5차 미충족 시 재교육</div></div>
-    <div class="field"><label>평가자 의견</label><textarea id="evComment" rows="2">${esc(ev.comment||'')}</textarea></div>`;
+    ${commentField(ev,autoObsComment(ev),'평가자 의견')}`;
 }
 function obsActionsHtml(ev){
   const c=obsCount(ev.marks);
@@ -1254,7 +1366,8 @@ function submitEval(){
   const ev=curEval;
   const cm=document.getElementById('evComment'); if(cm)ev.comment=cm.value;
   const rcm=document.getElementById('reComment'); if(rcm)ev.reComment=rcm.value;
-  if(ev.type==='skill'){ ev.score=skillTotal(ev.ans); ev.overall=skillLevel(ev.score); }
+  if(ev.type==='skill'){ ev.score=skillTotal(ev.ans); ev.overall=skillLevel(ev.score); applyAutoComment(ev,autoSkillComment(ev)); }
+  else if(!ev.reMarks){ applyAutoComment(ev,autoObsComment(ev)); }
   else{ ev.result=obsCount(ev.marks); if(ev.reMarks)ev.reResult=obsCount(ev.reMarks); }
   ev.status='submitted'; ev.evalDate=new Date().toISOString().slice(0,10); ev.updated=new Date().toISOString();
   save(); toast('제출 완료 — 팀장 승인 대기'); showView('view-eval'); renderWorkerList();
@@ -1469,12 +1582,12 @@ function saveWorkerModal(){
   if(WK_EDIT_ID){
     const wk=DB.workers.find(x=>x.id===WK_EDIT_ID); if(!wk)return;
     // id는 유지 → 기존 평가 이력 그대로 연결
-    wk.name=name; wk.emp=emp; wk.line=line; wk.proc=proc;
+    wk.name=name; wk.emp=emp; wk.line=line; wk.proc=proc; touch('workers');
     toast(name+' 정보 수정 완료');
   }else{
     const nw=w(name,emp,line,proc);
     if(DB.workers.some(x=>x.id===nw.id))nw.id='W'+emp+'_'+Date.now().toString(36);
-    DB.workers.push(nw); toast('작업자 추가 완료');
+    DB.workers.push(nw); touch('workers'); toast('작업자 추가 완료');
   }
   WK_EDIT_ID=null; save(); closeModal('workerModal');
 }
@@ -1483,6 +1596,7 @@ function delWorker(id){
   if(!isManager())return toast('작업자 관리는 팀장·관리자만 가능합니다');
   const wk=DB.workers.find(x=>x.id===id);
   if(!confirm((wk?wk.name+' ':'')+'작업자와 평가 이력을 삭제할까요?'))return;
+  tomb(DB.evals.filter(e=>e.workerId===id).map(e=>e.id)); touch('workers');
   DB.workers=DB.workers.filter(x=>x.id!==id); DB.evals=DB.evals.filter(e=>e.workerId!==id); save(); toast('삭제 완료'); }
 function renderMemAdmin(){
   const nL=DB.members.filter(x=>x.role==='leader').length, nA=DB.members.filter(x=>x.role==='admin').length;
@@ -1502,17 +1616,17 @@ function renderMemAdmin(){
 function toggleRole(i){ if(!isManager())return;
   const mm=DB.members[i];
   if(mm.role==='admin')return toast('관리자 등급은 여기서 변경할 수 없습니다');
-  mm.role=mm.role==='leader'?'evaluator':'leader'; save(); toast(mm.name+' → '+roleLabel(mm.role)); }
+  mm.role=mm.role==='leader'?'evaluator':'leader'; touch('members'); save(); toast(mm.name+' → '+roleLabel(mm.role)); }
 function editPin(i){ if(!isManager())return;
   if(DB.members[i].role==='admin'&&!isAdmin())return toast('관리자 PIN은 관리자만 변경할 수 있습니다');
   const nw=prompt(DB.members[i].name+' 님의 새 PIN (4자리)',DB.members[i].pin);
   if(!nw)return; if(!/^\d{4}$/.test(nw))return toast('4자리 숫자만 가능합니다');
-  DB.members[i].pin=nw; save(); toast('PIN 변경 완료'); }
+  DB.members[i].pin=nw; touch('members'); save(); toast('PIN 변경 완료'); }
 function delMember(i){ if(!isManager())return;
   const mm=DB.members[i];
   if(mm.role==='admin')return toast('관리자는 삭제할 수 없습니다');
   if(!confirm(mm.name+' 님을 구성원에서 삭제할까요?'))return;
-  DB.members.splice(i,1); save(); toast('삭제 완료'); }
+  DB.members.splice(i,1); touch('members'); save(); toast('삭제 완료'); }
 function openMemberModal(){ if(!isManager())return toast('팀장 또는 관리자 권한이 필요합니다');
   document.getElementById('nmRole').innerHTML='<option value="evaluator">팀원 (평가 작성)</option><option value="leader">팀장 (평가 승인)</option>'+(isAdmin()?'<option value="admin">마스터관리자 (전권)</option>':'');
   document.getElementById('memberModal').classList.add('on'); }
@@ -1521,15 +1635,15 @@ function addMember(){
   if(!name)return toast('이름을 입력하세요');
   if(!/^\d{4}$/.test(pin))return toast('PIN은 4자리 숫자');
   if(DB.members.some(x=>x.name===name))return toast('이미 등록된 이름입니다');
-  DB.members.push(m(name,pin,role)); save(); closeModal('memberModal'); toast('구성원 추가 완료');
+  DB.members.push(m(name,pin,role)); touch('members'); save(); closeModal('memberModal'); toast('구성원 추가 완료');
   document.getElementById('nmName').value='';document.getElementById('nmPin').value=''; }
 function exportJson(){ const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(DB,null,2)],{type:'application/json'}));
   a.download=`숙련도작업관찰_백업_${new Date().toISOString().slice(0,10)}.json`; a.click(); }
 function importJson(inp){ const f=inp.files[0]; if(!f)return; const r=new FileReader();
-  r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.workers)throw 0;DB=d;save();toast('복원 완료');}catch(e){toast('올바른 백업 파일이 아닙니다');}};
+  r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.workers)throw 0;d.sb=DB.sb;DB=d;touch('workers');touch('members');touch('evalsAll');save();toast('복원 완료');}catch(e){toast('올바른 백업 파일이 아닙니다');}};
   r.readAsText(f); inp.value=''; }
-function resetData(){ if(confirm('모든 데이터를 초기화할까요? (되돌릴 수 없음)')){DB=DEFAULT_DB();save();toast('초기화 완료');} }
+function resetData(){ if(confirm('모든 데이터를 초기화할까요? (되돌릴 수 없음)')){const sb=DB.sb;DB=DEFAULT_DB();DB.sb=sb;touch('workers');touch('members');touch('evalsAll');save();toast('초기화 완료');} }
 
 /* ═══ 초기화 ═══ */
 function refreshAll(){
