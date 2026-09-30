@@ -217,6 +217,9 @@ table.matrix tr:last-child td{border-bottom:none}
 .cm-tag.on{background:#e7f2e8;color:var(--ok)}
 .cm-tag.edit{background:var(--amber-soft);color:#8a5a0a}
 .cm-re{font-size:11px;font-weight:700;color:var(--blue,#1f5fa8);text-decoration:underline;background:none;padding:0}
+.worker-row.out{opacity:.62}
+.badge.out{background:#eef1f4;color:#6b7785}
+table.ledger .ld-out{color:#9aa6b2;font-size:11px;background:#f7f8fa}
 </style>
 </head>
 <body>
@@ -481,7 +484,7 @@ table.matrix tr:last-child td{border-bottom:none}
      <button class="btn btn-ghost btn-sm" onclick="delWorker(&#39;W260105&#39;)">삭제</button></div></div>
       <button id="wkAddBtn" class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="openWorkerModal()">+ 작업자 추가</button>
 
-      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-30c</span></h3>
+      <h3>평가일정 알람 📅 <span class="muted" style="font-weight:400">· 빌드 2026-09-30d</span></h3>
       <div id="alarmInfo"><div class="alarm-next hot">
     다음 정기 평가: <b>3분기</b> · 2026-09-14 <span class="dd">D-15</span>
     <div class="muted" style="font-size:11.5px;margin-top:3px">평가일 기준: 1분기 3/15 · 2분기 6/15 · 3분기 9/15 · 4분기 12/15 (매년 반복)</div>
@@ -620,7 +623,7 @@ table.matrix tr:last-child td{border-bottom:none}
   <div class="modal">
     <h3 id="wkModalTitle">작업자 추가</h3>
     <div class="field"><label>이름</label><input id="nwName"></div>
-    <div class="field"><label>사번</label><input id="nwEmp" placeholder="예: 260105"></div>
+    <div class="field"><label>사번 <span class="muted" style="font-weight:400">(앞 6자리 = 입사일 YYMMDD)</span></label><input id="nwEmp" placeholder="예: 260105 → 2026-01-05 입사"></div>
     <div class="field"><label>라인</label><select id="nwLine"></select></div>
     <div class="field"><label>담당 공정</label><select id="nwProc"></select></div>
     <div style="display:flex;gap:8px;margin-top:6px">
@@ -653,6 +656,18 @@ function currentQuarter(){ const mo=new Date().getMonth()+1; return mo<=3?'Q1':m
 const EVAL_SCHEDULE={Q1:'03-15',Q2:'06-15',Q3:'09-15',Q4:'12-15'};
 const EVAL_ALERT_DAYS=15;
 function ymdLocal(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+/* ═══ 입사일 기준 평가 대상 ═══
+   사번 앞 6자리(YYMMDD)를 입사일로 사용. 입사일이 분기 평가일 이후면 그 분기 대상에서 제외 */
+function hireDate(wk){
+  const m=/^(\d{2})(\d{2})(\d{2})/.exec(String(wk&&wk.emp||'')); if(!m)return null;
+  let y=+m[1]; const mo=+m[2], d=+m[3], cy=new Date().getFullYear()%100;
+  y+= (y<=cy+1)?2000:1900;
+  const dt=new Date(y,mo-1,d);
+  return (dt.getMonth()===mo-1&&dt.getDate()===d)?dt:null;
+}
+function evalDateOf(q,y){ return new Date((y||YEAR)+'-'+EVAL_SCHEDULE[q]+'T00:00:00'); }
+function isTarget(wk,q,y){ const h=hireDate(wk); return !h||h<=evalDateOf(q,y); }
+function targetsOf(q,y){ return DB.workers.filter(wk=>isTarget(wk,q,y)); }
 // 알림 대상 분기: 평가일 15일 전이 지났고 아직 전원 승인완료가 아닌 분기 (서버 메일 규칙과 동일)
 function pendingEvalQuarters(){
   const now=new Date(); now.setHours(0,0,0,0);
@@ -661,8 +676,9 @@ function pendingEvalQuarters(){
     const d=new Date(y+'-'+EVAL_SCHEDULE[q]+'T00:00:00');
     const start=new Date(d.getTime()-EVAL_ALERT_DAYS*86400000);
     if(now<start)continue;
-    const done=DB.workers.filter(wk=>DB.evals.some(e=>e.type==='skill'&&e.workerId===wk.id&&Number(e.year)===y&&e.quarter===q&&e.status==='approved')).length;
-    if(done<DB.workers.length) out.push({q,date:d,dday:Math.round((d-now)/86400000),done,total:DB.workers.length});
+    const tg=targetsOf(q,y);
+    const done=tg.filter(wk=>DB.evals.some(e=>e.type==='skill'&&e.workerId===wk.id&&Number(e.year)===y&&e.quarter===q&&e.status==='approved')).length;
+    if(done<tg.length) out.push({q,date:d,dday:Math.round((d-now)/86400000),done,total:tg.length});
   }
   return out;
 }
@@ -1011,11 +1027,11 @@ function renderQTabs(){
   el.style.display=LIST_MODE==='skill'?'flex':'none';
   const cq=currentQuarter();
   el.innerHTML=QUARTERS.map(q=>{
-    const evs=DB.workers.map(wk=>latestEval(wk.id,'skill',{quarter:q}));
+    const evs=targetsOf(q).map(wk=>latestEval(wk.id,'skill',{quarter:q}));
     const done=evs.filter(e=>e&&e.status==='approved').length;
-    const total=DB.workers.length;
+    const total=evs.length;
     const allDone=done===total&&total>0;
-    const stat=done===0?'미실시':allDone?`완료 ${done}/${total}`:`진행 ${done}/${total}`;
+    const stat=done===0?`미실시 0/${total}`:allDone?`완료 ${done}/${total}`:`진행 ${done}/${total}`;
     return `<button class="${q===CUR_Q?'on':''} ${allDone?'done':''} ${q===cq?'cur':''}" onclick="selectQuarter('${q}')">${Q_LABEL[q]}<span class="qs">${stat}</span></button>`;
   }).join('');
 }
@@ -1095,8 +1111,14 @@ function renderWorkerList(){
   let html='';
   DB.workers.filter(wk=>(!fl||wk.line===fl)&&(!fn||wk.name.includes(fn))).forEach(wk=>{
     const ev=latestEval(wk.id,LIST_MODE,LIST_MODE==='skill'?{quarter:CUR_Q}:{});
-    const st=ev?ev.status:'none';
+    const outQ=LIST_MODE==='skill'&&!isTarget(wk,CUR_Q)&&!ev;
+    const st=outQ?'out':(ev?ev.status:'none');
     if(fs&&st!==fs)return;
+    if(outQ){ const h=hireDate(wk);
+      html+=`<div class="worker-row out">${quadSvg(0,34)}
+        <div class="info"><b>${esc(wk.name)}</b><small>${esc(wk.emp)} · ${esc(wk.line)} · ${esc(wk.proc)}</small></div>
+        <div class="acts"><span class="badge out">대상 아님</span><small class="muted" style="font-size:11px">입사 ${ymdLocal(h)} → ${Q_LABEL[CUR_Q]} 평가일 이후</small></div></div>`;
+      return; }
     const badge={none:'<span class="badge none">미평가</span>',draft:'<span class="badge draft">작성중</span>',
       submitted:'<span class="badge submitted">승인대기</span>',approved:'<span class="badge approved">승인완료</span>'}[st];
     let extra='';
@@ -1143,7 +1165,9 @@ function renderAlerts(){
       t:`<b>${Q_LABEL[p.q]} 정기 숙련도 평가 ${dtxt}</b> — ${ymdLocal(p.date)} ${late?'평가일 경과, 조속히 완료하세요.':'예정.'} 승인완료 <b>${p.done}/${p.total}</b>명 (완료 시까지 매일 메일 발송)`});
   });
   if(LIST_MODE==='skill'){
-    const evs=DB.workers.map(wk=>latestEval(wk.id,'skill',{quarter:CUR_Q}));
+    const tgQ=targetsOf(CUR_Q); const total=tgQ.length, outN=DB.workers.length-total;
+    const evs=tgQ.map(wk=>latestEval(wk.id,'skill',{quarter:CUR_Q}));
+    if(outN>0)alerts.push({c:'info',i:'🆕',t:`입사일이 ${Q_LABEL[CUR_Q]} 평가일 이후인 <b>${outN}명</b>은 이번 분기 대상에서 제외 (다음 분기부터 자동 포함)`});
     const notDone=evs.filter(e=>!e||e.status==='none'||e.status==='draft').length;
     const pend=evs.filter(e=>e&&e.status==='submitted').length;
     if(notDone>0)alerts.push({c:'info',i:'📋',t:`${Q_LABEL[CUR_Q]} 숙련도 <b>미평가 ${notDone}명</b> — 평가를 진행하세요. (IATF 16949 7.2 적격성)`,filter:'none'});
@@ -1166,6 +1190,9 @@ function jumpFilter(st){ document.getElementById('fStatus').value=st==='none'?'n
 /* ═══ 평가 시작/작성 ═══ */
 function startEval(wid){
   if(!canEvaluate())return toast('평가는 강창구·김상기·강병주만 가능합니다');
+  { const w0=DB.workers.find(x=>x.id===wid);
+    if(LIST_MODE==='skill'&&w0&&!isTarget(w0,CUR_Q)&&!latestEval(wid,'skill',{quarter:CUR_Q}))
+      return toast(`${w0.name}: 입사일(${ymdLocal(hireDate(w0))})이 ${Q_LABEL[CUR_Q]} 평가일 이후라 대상이 아닙니다`); }
   const wk=DB.workers.find(x=>x.id===wid);
   let ev=DB.evals.find(e=>e.workerId===wid&&e.type===LIST_MODE&&e.year===YEAR&&e.status==='draft'&&(LIST_MODE!=='skill'||e.quarter===CUR_Q));
   if(!ev){
@@ -1449,8 +1476,8 @@ function openReport(id){
 /* ═══ 대시보드 ═══ */
 function renderDash(){
   document.getElementById('dashYear').textContent=YEAR+'년 '+Q_LABEL[CUR_Q]+' (숙련도)';
-  const total=DB.workers.length;
-  const evs=DB.workers.map(wk=>latestEval(wk.id,'skill',{quarter:CUR_Q}));
+  const tgQ=targetsOf(CUR_Q), total=tgQ.length;
+  const evs=tgQ.map(wk=>latestEval(wk.id,'skill',{quarter:CUR_Q}));
   const cnt=s=>evs.filter(e=>e&&e.status===s).length;
   const none=evs.filter(e=>!e).length+cnt('draft');
   document.getElementById('kpiGrid').innerHTML=`
@@ -1459,7 +1486,7 @@ function renderDash(){
     <div class="kpi"><b style="color:var(--amber)">${cnt('submitted')}</b><span>승인 대기</span></div>
     <div class="kpi"><b style="color:var(--danger)">${none}</b><span>미평가</span></div>`;
   document.getElementById('lineProg').innerHTML=LINES.map(l=>{
-    const grp=DB.workers.filter(wk=>wk.line===l); if(!grp.length)return'';
+    const grp=tgQ.filter(wk=>wk.line===l); if(!grp.length)return'';
     const done=grp.filter(wk=>{const e=latestEval(wk.id,'skill',{quarter:CUR_Q});return e&&e.status==='approved';}).length;
     const pct=grp.length?Math.round(done/grp.length*100):0;
     return `<div class="prog-row"><div class="lbl"><span>${l}</span><span>${done}/${grp.length}명 · ${pct}%</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>`;
@@ -1499,9 +1526,9 @@ function lvScore(wid,q){ const e=latestEval(wid,'skill',{quarter:q}); return (e&
 function renderQtrTrend(){
   // KPI: 분기별 평균 Level (승인완료 인원 기준)
   document.getElementById('trendKpi').innerHTML=QUARTERS.map(q=>{
-    const rows=DB.workers.map(wk=>lvScore(wk.id,q)).filter(Boolean);
+    const rows=targetsOf(q).map(wk=>lvScore(wk.id,q)).filter(Boolean);
     const avg=rows.length?(rows.reduce((s,r)=>s+r.lv,0)/rows.length):0;
-    const done=rows.length, total=DB.workers.length;
+    const done=rows.length, total=targetsOf(q).length;
     return `<div class="kpi"><b style="color:${avg>=3?'var(--ok)':avg>=2?'var(--amber)':avg>0?'var(--danger)':'var(--steel)'}">${avg?avg.toFixed(1):'-'}</b>
       <span>${Q_LABEL[q]} 평균Lv<br>${done?`완료 ${done}/${total}`:'미실시'}</span></div>`;
   }).join('');
@@ -1557,7 +1584,7 @@ function renderWkAdmin(){
   document.getElementById('wkCount').textContent='('+DB.workers.length+'명)';
   const ab=document.getElementById('wkAddBtn'); if(ab)ab.style.display=can?'':'none';
   document.getElementById('wkAdmin').innerHTML=DB.workers.map(wk=>
-    `<div class="wk-admin-row"><div class="grow"><b>${esc(wk.name)}</b> <small>${esc(wk.emp)} · ${esc(wk.line)} · ${esc(wk.proc)}</small></div>
+    `<div class="wk-admin-row"><div class="grow"><b>${esc(wk.name)}</b> <small>${esc(wk.emp)} · ${esc(wk.line)} · ${esc(wk.proc)}${hireDate(wk)?' · 입사 '+ymdLocal(hireDate(wk)):' · <span style="color:var(--danger)">사번에서 입사일 확인 불가</span>'}</small></div>
      ${can?`<button class="btn btn-ghost btn-sm" onclick="openWorkerModal('${wk.id}')">수정</button>
      <button class="btn btn-ghost btn-sm" onclick="delWorker('${wk.id}')">삭제</button>`:''}</div>`).join('')
     +(can?'':'<p class="muted" style="margin-top:6px">작업자 추가·수정·삭제는 팀장·관리자만 가능합니다.</p>');
@@ -1677,13 +1704,14 @@ function renderLedger(){
   const qDone={};
   QUARTERS.forEach(q=>{
     const d=new Date(now.getFullYear()+'-'+EVAL_SCHEDULE[q]+'T00:00:00');
-    const evs=DB.workers.map(wk=>latestEval(wk.id,'skill',{quarter:q}));
+    const tg=targetsOf(q), total=tg.length;
+    const evs=tg.map(wk=>latestEval(wk.id,'skill',{quarter:q}));
     const appr=evs.filter(e=>e&&e.status==='approved').length;
     const pend=evs.filter(e=>e&&e.status==='submitted').length;
     qDone[q]={appr,pend};
     const dd=Math.round((d-now)/86400000);
     let st,cls;
-    if(appr>=total){st='완료';cls='ok';}
+    if(total>0&&appr>=total){st='완료';cls='ok';}
     else if(appr>0||pend>0){st='진행중 '+appr+'/'+total;cls='ing';}
     else if(dd<0){st='미실시';cls='miss';}
     else if(dd<=EVAL_ALERT_DAYS){st='D-'+dd;cls='soon';}
@@ -1692,8 +1720,8 @@ function renderLedger(){
       <div class="lq-name">${Q_LABEL[q]}</div>
       <div class="lq-date">${now.getFullYear()}.${EVAL_SCHEDULE[q].replace('-','.')}</div>
       <div class="lq-st">${st}</div>
-      <div class="lq-bar"><i style="width:${Math.round(appr/total*100)}%"></i></div>
-      <div class="lq-n">${appr}/${total}명 승인완료${pend?' · 대기 '+pend:''}</div>
+      <div class="lq-bar"><i style="width:${total?Math.round(appr/total*100):0}%"></i></div>
+      <div class="lq-n">${appr}/${total}명 승인완료${pend?' · 대기 '+pend:''}${DB.workers.length>total?' · 대상외 '+(DB.workers.length-total):''}</div>
     </div>`;
   });
   // ── ② 작업관찰 현황 ──
@@ -1716,6 +1744,7 @@ function renderLedger(){
         if(e&&e.status==='approved')tds+=`<td class="ld-ok" onclick="openReport('${e.id}')">Lv${e.overall}<small>${e.score}</small></td>`;
         else if(e&&e.status==='submitted')tds+=`<td class="ld-pd" onclick="openReport('${e.id}')">대기</td>`;
         else if(e&&e.status==='draft')tds+=`<td class="ld-dr">작성중</td>`;
+        else if(!isTarget(wk,q))tds+=`<td class="ld-out" title="입사 ${ymdLocal(hireDate(wk))}">대상외</td>`;
         else tds+=`<td class="ld-no">-</td>`;
       });
       const os=obsState(latestEval(wk.id,'obs'));
