@@ -901,7 +901,7 @@ const PROD_MEMBERS=[
 ];
 const DEFAULT_DB=()=>({
   members:JSON.parse(JSON.stringify(PROD_MEMBERS)),
-  sb:{url:'https://ebthltdmxpzlkfwvdloz.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidGhsdGRteHB6bGtmd3ZkbG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNTcxNTQsImV4cCI6MjA5MDczMzE1NH0.bXqNpOtDMCFjuZROrIDm_3o0kHmNESs7EHOgGnFCxAM'},
+  sb:{url:'https://omngtyewdaqpphnzeate.supabase.co',key:'sb_publishable_9j2YkkL-7ul1TrhH-NjVdQ_vWDG2-1D'},
   workers:JSON.parse(JSON.stringify(REAL_WORKERS)),
   evals:JSON.parse(JSON.stringify(PRELOAD_EVALS))
 });
@@ -910,8 +910,8 @@ const DEFAULT_DB=()=>({
 /* ═══ 저장/동기화 ═══ */
 function load(){ try{DB=JSON.parse(localStorage.getItem(LS_KEY))}catch(e){} if(!DB||!DB.workers)DB=DEFAULT_DB();
   if(!DB.sb)DB.sb={};
-  if(!DB.sb.url)DB.sb.url='https://ebthltdmxpzlkfwvdloz.supabase.co';
-  if(!DB.sb.key)DB.sb.key='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidGhsdGRteHB6bGtmd3ZkbG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNTcxNTQsImV4cCI6MjA5MDczMzE1NH0.bXqNpOtDMCFjuZROrIDm_3o0kHmNESs7EHOgGnFCxAM';
+  if(!DB.sb.url)DB.sb.url='https://omngtyewdaqpphnzeate.supabase.co';
+  if(!DB.sb.key)DB.sb.key='sb_publishable_9j2YkkL-7ul1TrhH-NjVdQ_vWDG2-1D';
   if(!DB.members||!DB.members.length)DB.members=JSON.parse(JSON.stringify(PROD_MEMBERS));
   if(!DB.members.some(x=>x.role==='admin'))DB.members.unshift(m('김상기','4003','admin'));
   if(!DB.evals||!DB.evals.length)DB.evals=JSON.parse(JSON.stringify(PRELOAD_EVALS));
