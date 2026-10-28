@@ -1,14 +1,12 @@
-// 태진다이텍 작업자 숙련도 평가 메일 알람 (Gmail SMTP)
+// 태진다이텍 작업자 숙련도 평가 알림 (ntfy 휴대폰 알림) — v9: Gmail 메일 → ntfy 로 변경
 // 규칙: 분기 평가일 N일 전(start_before)부터 매일 발송 → 해당 분기 대상자 전원 '승인완료' 시 자동 중지
 //       평가일 경과 후에도 미완료면 매일 발송(지연 D+N 표시)
 //       평가 대상 = 입사일(사번 앞 6자리 YYMMDD)이 분기 평가일 이전·당일인 작업자 (앱과 동일 기준)
 // 파라미터: ?test=1 (당일 발송 여부 무시·강제 발송) ?dry=1 (발송 없이 결과만) ?date=YYYY-MM-DD (기준일 시뮬레이션)
-// 주의: 메일 제목은 ASCII 유지 (한글 제목 인코딩 시 헤더 깨짐)
+// 알림 주제: eval_alarm_config.ntfy_topic (앱 설정 화면에서 변경). 한글 제목은 JSON 본문으로 보내야 깨지지 않음
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-import { SMTPClient } from 'https://deno.land/x/denomailer@1.6.0/mod.ts';
 
-const GMAIL_USER = (Deno.env.get('GMAIL_USER') ?? '').trim();
-const GMAIL_PASS = (Deno.env.get('GMAIL_APP_PASSWORD') ?? '').replace(/\s+/g, '');
+const DEF_TOPIC = 'taejin_qc_call';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
@@ -24,7 +22,6 @@ function kstToday(): Date {
   return new Date(Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate()));
 }
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
-const esc = (s: string) => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
 
 // 사번 앞 6자리(YYMMDD) → 입사일 (확인 불가 시 null = 항상 대상)
 function hireDate(emp: string, refYear: number): Date | null {
@@ -59,49 +56,40 @@ function quarterStatus(workers: Worker[], evals: Eval[], q: string, year: number
 }
 
 function ddText(dd: number) { return dd > 0 ? `D-${dd}` : dd === 0 ? '오늘(D-Day)' : `지연 D+${-dd}`; }
-function ddAscii(dd: number) { return dd > 0 ? `D-${dd}` : dd === 0 ? 'D-DAY' : `OVERDUE D+${-dd}`; }
-
-function names(list: Worker[]) {
-  if (!list.length) return '<span style="color:#94a3b8">없음</span>';
-  return list.map(w => `<span style="display:inline-block;background:#f1f5f9;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0;font-size:12.5px">${esc(w.name)} <span style="color:#64748b">${esc(w.line)}</span></span>`).join('');
+function nameList(list: Worker[], max = 15) {
+  if (!list.length) return '없음';
+  const t = list.slice(0, max).map(w => w.line ? `${w.name}(${w.line})` : w.name).join(', ');
+  return list.length > max ? `${t} 외 ${list.length - max}명` : t;
 }
 
-function buildHtml(list: Status[], appUrl: string, isTest: boolean) {
+// ntfy 알림 제목·본문 (본문은 일반 텍스트, 4,000자 이내)
+function buildNote(list: Status[], isTest: boolean) {
+  const head = list[0];
+  const doneTxt = list.length === 1 ? `${head.done}/${head.total}` : list.map(s => `${s.year} ${Q_LABEL[s.q] ?? s.q} ${s.done}/${s.total}`).join(' · ');
+  const title = `${isTest ? '[테스트] ' : ''}[숙련도평가] ${head.year}년 ${Q_LABEL[head.q] ?? head.q} ${ddText(head.dd)} · 승인 ${doneTxt}`;
   const blocks = list.map(s => {
     const pct = s.total ? Math.round(s.done / s.total * 100) : 0;
-    const late = s.dd < 0;
-    const color = late ? '#c0392b' : s.dd <= 3 ? '#b45309' : '#1f3a5f';
-    return `
-<div style="border:1px solid #d8e0e8;border-radius:12px;margin-bottom:14px;overflow:hidden">
-  <div style="background:${color};color:#fff;padding:12px 16px">
-    <div style="font-size:16px;font-weight:800">${s.year}년 ${Q_LABEL[s.q] ?? s.q} 숙련도 평가 · ${ddText(s.dd)}</div>
-    <div style="font-size:12px;opacity:.85;margin-top:2px">평가 예정일 ${s.evalDate}${late ? ' — 평가일이 지났습니다. 조속히 완료해 주세요.' : ''}</div>
-  </div>
-  <div style="padding:14px 16px">
-    <div style="font-size:14px;margin-bottom:6px">진행률 <b style="font-size:18px">${s.done}</b> / ${s.total}명 승인완료 (${pct}%)</div>
-    <div style="height:8px;background:#e8eef4;border-radius:5px;overflow:hidden;margin-bottom:12px">
-      <div style="height:8px;width:${pct}%;background:#3f9142"></div></div>
-    <table style="border-collapse:collapse;font-size:13.5px;width:100%">
-      <tr><td style="padding:6px 10px 6px 0;color:#475569;white-space:nowrap;vertical-align:top;width:92px">미평가 <b style="color:#c0392b">${s.notStarted.length}</b>명</td><td style="padding:6px 0">${names(s.notStarted)}</td></tr>
-      <tr><td style="padding:6px 10px 6px 0;color:#475569;white-space:nowrap;vertical-align:top">승인대기 <b style="color:#b45309">${s.pend.length}</b>명</td><td style="padding:6px 0">${names(s.pend)}</td></tr>
-      ${s.excluded.length ? `<tr><td style="padding:6px 10px 6px 0;color:#94a3b8;white-space:nowrap;vertical-align:top">대상외 ${s.excluded.length}명</td><td style="padding:6px 0;color:#94a3b8;font-size:12.5px">${s.excluded.map(w => esc(w.name)).join(', ')} — 입사일이 평가일 이후(다음 분기부터 대상)</td></tr>` : ''}
-    </table>
-  </div>
-</div>`;
-  }).join('');
-  const testBadge = isTest
-    ? `<div style="background:#fdf1f1;border:1px solid #f3c0c0;color:#8a2b2b;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:12px">※ 본 메일은 발송 테스트입니다.</div>` : '';
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
-<div style="font-family:'Malgun Gothic',AppleGothic,sans-serif;font-size:14px;color:#1f2937;max-width:660px">
-${testBadge}
-<div style="font-size:18px;font-weight:800;color:#1f3a5f;margin-bottom:4px">작업자 숙련도 평가 진행 알림</div>
-<div style="font-size:12.5px;color:#64748b;margin-bottom:14px">태진다이텍(주) 품질관리팀 · 평가가 모두 승인완료될 때까지 매일 08:00에 발송됩니다.</div>
-${blocks}
-<div style="font-size:13px;color:#475569;margin:6px 0 14px">평가자: 강창구 팀장 · 김상기 과장 · 강병주 부장 / 승인대기 건은 팀장 승인이 필요합니다.</div>
-<a href="${appUrl}" style="display:inline-block;background:#e8a33d;color:#ffffff;text-decoration:none;font-weight:800;padding:10px 18px;border-radius:9px">평가 시스템 열기</a>
-<div style="color:#94a3b8;font-size:11.5px;margin-top:18px;border-top:1px solid #e8eef4;padding-top:10px">
-IATF 16949 7.2 적격성 / 현대·기아 SQ 인력관리 기록 &mdash; 본 메일은 자동 발송되었습니다.</div>
-</div></body></html>`;
+    const lines = [
+      `■ ${s.year}년 ${Q_LABEL[s.q] ?? s.q} · 평가일 ${s.evalDate} (${ddText(s.dd)})`,
+      `승인완료 ${s.done}/${s.total}명 (${pct}%)`,
+      `미평가 ${s.notStarted.length}명: ${nameList(s.notStarted)}`,
+      `승인대기 ${s.pend.length}명: ${nameList(s.pend)}`,
+    ];
+    if (s.excluded.length) lines.push(`대상외 ${s.excluded.length}명: ${s.excluded.map(w => w.name).join(', ')} (평가일 이후 입사)`);
+    if (s.dd < 0) lines.push('평가일이 지났습니다. 조속히 완료해 주세요.');
+    return lines.join('\n');
+  });
+  let message = blocks.join('\n\n') + '\n\n평가자: 강창구 팀장 · 김상기 과장 · 강병주 부장 / 승인대기는 팀장 승인 필요';
+  if (message.length > 3800) message = message.slice(0, 3800) + '\n…';
+  const urgent = list.some(s => s.dd <= 3);
+  return { title, message, priority: urgent ? 4 : 3, tags: [list.some(s => s.dd < 0) ? 'warning' : 'memo'] };
+}
+
+async function ntfySend(topic: string, n: { title: string; message: string; priority: number; tags: string[] }, click?: string) {
+  const body: Record<string, unknown> = { topic, ...n };
+  if (click) body.click = click;
+  const r = await fetch('https://ntfy.sh/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(`ntfy ${r.status} ${(await r.text()).slice(0, 200)}`);
 }
 
 Deno.serve(async (req) => {
@@ -162,32 +150,23 @@ Deno.serve(async (req) => {
     const summary = (s: Status) => ({ quarter: `${s.year} ${s.q}`, evalDate: s.evalDate, dday: ddText(s.dd), done: `${s.done}/${s.total}`,
       notStarted: s.notStarted.length, pending: s.pend.length, excluded: s.excluded.map(w => w.name) });
 
+    const topic = String(cfg.ntfy_topic || DEF_TOPIC).trim();
     const todayStr = ymd(today);
     const alreadySent = !isTest && !dateParam && cfg.last_sent_on === todayStr;
     if (!sendList.length || alreadySent || isDry) {
       return new Response(JSON.stringify({
         ok: true, today: todayStr, dataKey: kv[0].key, workers: workers.length,
         willSend: sendList.length > 0 && !alreadySent, alreadySent, dry: isDry,
-        targets: sendList.map(summary), recipients: cfg.recipients,
+        targets: sendList.map(summary), topic,
+        preview: isDry && sendList.length ? buildNote(sendList, isTest) : undefined,
       }), { headers: JSONH });
     }
 
-    if (!GMAIL_USER || !GMAIL_PASS) return new Response(JSON.stringify({ ok: false, error: 'GMAIL secret 미설정' }), { status: 500, headers: JSONH });
-    const recipients: string[] = cfg.recipients ?? [];
-    if (!recipients.length) return new Response(JSON.stringify({ ok: true, skipped: 'no recipients' }), { headers: JSONH });
-
-    const head = sendList[0];
-    const doneTxt = sendList.map(s => `${s.q} ${s.done}/${s.total}`).join(', ');
-    const subject = isTest
-      ? `[TEST] Skill Evaluation Reminder - ${doneTxt} done`
-      : `[Taejin Quality] Skill Evaluation ${head.year} ${head.q} ${ddAscii(head.dd)} - ${doneTxt} done`;
-    const html = buildHtml(sendList, cfg.app_url, isTest);
-
+    const note = buildNote(sendList, isTest);
     let ok = true, detail = 'sent';
-    const client = new SMTPClient({ connection: { hostname: 'smtp.gmail.com', port: 465, tls: true, auth: { username: GMAIL_USER, password: GMAIL_PASS } } });
-    try { await client.send({ from: GMAIL_USER, to: recipients, subject, html }); }
+    try { await ntfySend(topic, note, cfg.app_url); }
     catch (e) { ok = false; detail = String(e).slice(0, 500); }
-    finally { try { await client.close(); } catch (_) { /* ignore */ } }
+    const recipients = ['ntfy:' + topic];
 
     for (const s of sendList) {
       await sb.from('eval_alarm_log').insert({
@@ -197,7 +176,7 @@ Deno.serve(async (req) => {
     }
     if (ok && !isTest && !dateParam) await sb.from('eval_alarm_config').update({ last_sent_on: todayStr }).eq('id', 1);
 
-    return new Response(JSON.stringify({ ok, sent: ok, subject, targets: sendList.map(summary), detail }), { headers: JSONH });
+    return new Response(JSON.stringify({ ok, sent: ok, topic, title: note.title, targets: sendList.map(summary), detail }), { headers: JSONH });
   } catch (e) {
     return new Response(JSON.stringify({ ok: false, error: String(e) }), { status: 500, headers: JSONH });
   }
