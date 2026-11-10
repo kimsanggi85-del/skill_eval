@@ -910,8 +910,9 @@ const DEFAULT_DB=()=>({
 /* ═══ 저장/동기화 ═══ */
 function load(){ try{DB=JSON.parse(localStorage.getItem(LS_KEY))}catch(e){} if(!DB||!DB.workers)DB=DEFAULT_DB();
   if(!DB.sb)DB.sb={};
-  if(!DB.sb.url)DB.sb.url='https://omngtyewdaqpphnzeate.supabase.co';
-  if(!DB.sb.key)DB.sb.key='sb_publishable_9j2YkkL-7ul1TrhH-NjVdQ_vWDG2-1D';
+  /* 2026-10-27 Supabase 통합: 브라우저에 옛 주소(ebthltd…)가 저장돼 있으면 SmartFactory 로 바꾼다 */
+  if(!DB.sb.url||String(DB.sb.url).indexOf('ebthltd')>=0){DB.sb.url='https://omngtyewdaqpphnzeate.supabase.co';DB.sb.key='';}
+  if(!DB.sb.key||String(DB.sb.key).indexOf('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidGhsdGRteHB6bGtmd3ZkbG96')===0||String(DB.sb.key).indexOf('sb_publishable_ZSgcZapb7cTgFezGmOV')===0)DB.sb.key='sb_publishable_9j2YkkL-7ul1TrhH-NjVdQ_vWDG2-1D';
   if(!DB.members||!DB.members.length)DB.members=JSON.parse(JSON.stringify(PROD_MEMBERS));
   if(!DB.members.some(x=>x.role==='admin'))DB.members.unshift(m('김상기','4003','admin'));
   if(!DB.evals||!DB.evals.length)DB.evals=JSON.parse(JSON.stringify(PRELOAD_EVALS));
